@@ -12,8 +12,8 @@
   --glass:rgba(255,255,255,0.90);
   --glass2:rgba(255,255,255,0.80);
   --glass-border:rgba(200,195,230,0.6);
-  --glass-shadow:0 4px 24px rgba(80,60,160,0.10),inset 1px 1px 0 rgba(255,255,255,1);
-  --glass-shadow-lg:0 8px 40px rgba(80,60,160,0.14),inset 1px 1px 0 rgba(255,255,255,1);
+  --glass-shadow:0 2px 8px rgba(80,60,160,0.1),inset 1px 1px 0 rgba(255,255,255,1),inset -1px -1px 2px rgba(255,255,255,0.5);
+  --glass-shadow-lg:0 8px 32px rgba(80,60,160,0.15),inset 1px 1px 0 rgba(255,255,255,1),inset -1px -1px 2px rgba(255,255,255,0.5);
   --text:#0b0f2a;--text2:#3d3a55;--text3:#7c7899;
   --accent:#4255ff;--accent2:#6b7bff;--accent-light:rgba(66,85,255,0.12);
   --green:#18b672;--red:#e83a4a;--orange:#f07b20;
@@ -23,30 +23,84 @@
   --ease2:cubic-bezier(0.34,1.56,0.64,1);
 }
 html{min-height:100vh;font-family:var(--font);color:var(--text);font-size:16px;overflow-x:hidden}
-body{min-height:100vh;background:var(--bg-grad);background-attachment:fixed}
+body{min-height:100vh;background:var(--bg-grad);background-attachment:fixed;display:flex;flex-direction:column}
 
 nav{
   position:sticky;top:0;z-index:200;
-  background:rgba(240,238,249,0.92);
+  background:rgba(240,238,249,0.85);
   backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
   border-bottom:1px solid rgba(200,195,230,0.5);
   padding:0 28px;height:64px;
   display:flex;align-items:center;justify-content:space-between;
+  box-shadow:var(--glass-shadow);
 }
 .nav-logo{font-size:20px;font-weight:800;letter-spacing:-0.5px;display:flex;align-items:center;gap:8px;}
-.nav-logo-icon{width:36px;height:36px;border-radius:12px;background:linear-gradient(135deg,#4255ff,#6b7bff);display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 2px 10px rgba(66,85,255,0.35);}
+.nav-logo-icon{width:36px;height:36px;border-radius:12px;background:linear-gradient(135deg,#4255ff,#6b7bff);display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 2px 10px rgba(66,85,255,0.35),inset 1px 1px 0 rgba(255,255,255,0.6);}
+.nav-actions{display:flex;gap:12px;align-items:center;flex:1;margin-left:20px}
+.search-box{
+  flex:1;max-width:400px;
+  height:36px;
+  background:linear-gradient(180deg,rgba(255,255,255,0.7) 0%,rgba(255,255,255,0.5) 100%);
+  border:1px solid rgba(200,195,230,0.6);
+  border-radius:18px;
+  padding:0 14px;
+  font-family:var(--font);
+  font-size:14px;
+  color:var(--text);
+  outline:none;
+  transition:all .2s;
+  box-shadow:inset 1px 1px 0 rgba(255,255,255,1),0 2px 6px rgba(80,60,160,0.06);
+}
+.search-box::placeholder{color:var(--text3)}
+.search-box:focus{
+  background:rgba(255,255,255,0.9);
+  border-color:#4255ff;
+  box-shadow:0 0 0 3px rgba(66,85,255,0.12),inset 1px 1px 0 rgba(255,255,255,1)
+}
+.nav-spacer{flex:1}
 .nav-actions{display:flex;gap:8px;align-items:center}
 
-.btn{display:inline-flex;align-items:center;gap:6px;border:none;border-radius:var(--r3);cursor:pointer;font-family:var(--font);font-size:14px;font-weight:700;padding:9px 18px;transition:all .2s var(--ease);outline:none;white-space:nowrap;}
+.btn{display:inline-flex;align-items:center;gap:6px;border:none;border-radius:var(--r3);cursor:pointer;font-family:var(--font);font-size:14px;font-weight:700;padding:9px 18px;transition:all .2s var(--ease);outline:none;white-space:nowrap;box-shadow:var(--glass-shadow)}
 .btn-primary{background:linear-gradient(180deg,#4255ff 0%,rgba(66,85,255,0.85) 100%);color:#fff;box-shadow:0 2px 12px rgba(66,85,255,0.35),inset 1px 1px 0 rgba(255,255,255,0.25);}
 .btn-primary:hover{filter:brightness(1.15);transform:scale(1.04) translateY(-1px)}
-.btn-glass{background:linear-gradient(180deg,rgba(255,255,255,0.9) 0%,rgba(255,255,255,0.75) 100%);color:var(--text);box-shadow:inset 1px 1px 0 rgba(255,255,255,1),0 2px 8px rgba(80,60,160,0.1);border:none;}
-.btn-glass:hover{background:rgba(255,255,255,0.95);transform:scale(1.04)}
+.btn-glass{background:linear-gradient(180deg,rgba(255,255,255,0.9) 0%,rgba(255,255,255,0.75) 100%);color:var(--text);box-shadow:var(--glass-shadow);border:none;}
+.btn-glass:hover{background:rgba(255,255,255,0.95);transform:scale(1.04);box-shadow:var(--glass-shadow-lg)}
 .btn-glass:active,.btn-primary:active{transform:scale(0.97)}
 .btn-lg{padding:13px 26px;font-size:16px;border-radius:var(--r)}
 .btn-sm{padding:6px 12px;font-size:13px;border-radius:var(--r4)}
-.btn-icon{width:40px;height:40px;padding:0;display:inline-flex;align-items:center;justify-content:center;background:linear-gradient(180deg,rgba(255,255,255,0.9) 0%,rgba(255,255,255,0.75) 100%);box-shadow:inset 1px 1px 0 rgba(255,255,255,1),0 2px 8px rgba(80,60,160,0.1);border:none;border-radius:12px;cursor:pointer;}
-.btn-icon:hover{background:rgba(255,255,255,0.95);transform:scale(1.08)}
+.btn-icon{width:40px;height:40px;padding:0;display:inline-flex;align-items:center;justify-content:center;background:linear-gradient(180deg,rgba(255,255,255,0.9) 0%,rgba(255,255,255,0.75) 100%);box-shadow:var(--glass-shadow);border:none;border-radius:12px;cursor:pointer;}
+.btn-icon:hover{background:rgba(255,255,255,0.95);transform:scale(1.08);box-shadow:var(--glass-shadow-lg)}
+
+.sidebar{
+  position:fixed;left:0;top:64px;z-index:180;
+  width:80px;height:calc(100vh - 64px);
+  background:linear-gradient(180deg,rgba(240,238,249,0.8) 0%,rgba(230,225,245,0.7) 100%);
+  backdrop-filter:blur(10px);
+  border-right:1px solid rgba(200,195,230,0.4);
+  display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 8px;
+  box-shadow:2px 0 12px rgba(80,60,160,0.08)
+}
+.sidebar-btn{
+  width:56px;height:56px;
+  border-radius:16px;
+  background:linear-gradient(180deg,rgba(255,255,255,0.6) 0%,rgba(255,255,255,0.4) 100%);
+  border:1px solid rgba(200,195,230,0.5);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  cursor:pointer;transition:all .2s;
+  box-shadow:1px 1px 2px rgba(255,255,255,0.9) inset,-1px -1px 2px rgba(255,255,255,0.6) inset,0 2px 8px rgba(80,60,160,0.08);
+  font-size:24px;color:var(--text);font-weight:700;
+}
+.sidebar-btn:hover{
+  background:rgba(255,255,255,0.8);
+  transform:scale(1.05);
+  box-shadow:1px 1px 2px rgba(255,255,255,1) inset,-1px -1px 2px rgba(255,255,255,0.8) inset,0 4px 12px rgba(80,60,160,0.12)
+}
+.sidebar-btn.active{
+  background:linear-gradient(180deg,#4255ff 0%,rgba(66,85,255,0.9) 100%);
+  color:#fff;
+  box-shadow:0 4px 12px rgba(66,85,255,0.35),inset 1px 1px 0 rgba(255,255,255,0.3)
+}
+.sidebar-label{font-size:9px;color:var(--text2);font-weight:700;margin-top:4px;text-align:center;letter-spacing:-0.5px;max-width:60px}
 
 /* Regular inputs for title/vak/etc */
 input[type="text"],input[type="date"],textarea,select{
@@ -200,7 +254,7 @@ textarea{resize:vertical;min-height:72px;line-height:1.5}
 /* ── PRESET COLORS ── */
 /* defined in JS: COLORS */
 
-.screen{padding:28px 32px;max-width:1100px;margin:0 auto;width:100%}
+.screen{padding:28px 32px;max-width:1200px;margin:0 auto;width:100%;margin-left:80px}
 @keyframes pageIn{from{opacity:0;transform:scale(0.94) translateY(20px)}to{opacity:1;transform:scale(1) translateY(0)}}
 .page-enter{animation:pageIn .4s var(--ease2) both}
 @keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
@@ -209,22 +263,40 @@ textarea{resize:vertical;min-height:72px;line-height:1.5}
 .home-hero h1{font-size:46px;font-weight:800;line-height:1.1;letter-spacing:-1.5px;margin-bottom:10px}
 .home-hero h1 span{background:linear-gradient(135deg,#4255ff 0%,#a78bfa 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
 .home-hero p{color:var(--text2);font-size:17px;max-width:440px;margin:0 auto 28px}
-.hero-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.home-hero .meta-info{display:flex;gap:20px;justify-content:center;margin-bottom:24px;flex-wrap:wrap}
+.meta-item{background:var(--glass);border:1px solid var(--glass-border);border-radius:var(--r);padding:14px 20px;box-shadow:var(--glass-shadow)}
+.meta-item .label{font-size:12px;color:var(--text2);font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.meta-item .value{font-size:24px;font-weight:800;color:var(--accent);margin-top:4px}
 
-.sets-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:16px;margin-top:20px}
-.set-card{background:var(--glass);border:1px solid var(--glass-border);border-radius:var(--r2);padding:22px;cursor:pointer;box-shadow:var(--glass-shadow);transition:all .25s var(--ease);position:relative;overflow:hidden;}
-.set-card::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#4255ff,#6b7bff);transform:scaleX(0);transform-origin:left;transition:.3s var(--ease)}
-.set-card:hover{transform:translateY(-4px) scale(1.01);box-shadow:var(--glass-shadow-lg)}
-.set-card:hover::after{transform:scaleX(1)}
+.section-row{display:flex;align-items:center;justify-content:space-between;margin:32px 0 16px;gap:12px}
+.section-row h2{font-size:20px;font-weight:800;letter-spacing:-0.3px}
+.section-row a{color:var(--accent);font-size:13px;text-decoration:none;font-weight:700}
+.section-row a:hover{text-decoration:underline}
+
+.sets-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:16px;margin-bottom:20px}
+.set-card{
+  background:linear-gradient(180deg,rgba(255,255,255,0.8) 0%,rgba(255,255,255,0.6) 100%);
+  border:1px solid var(--glass-border);
+  border-radius:var(--r2);
+  padding:22px;
+  cursor:pointer;
+  box-shadow:var(--glass-shadow);
+  transition:all .25s var(--ease);
+  position:relative;overflow:hidden;
+  display:flex;flex-direction:column
+}
+.set-card::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:3px;background:linear-gradient(90deg,transparent,#4255ff,transparent);transition:.4s}
+.set-card:hover::before{left:100%}
+.set-card:hover{transform:translateY(-6px);box-shadow:var(--glass-shadow-lg);background:linear-gradient(180deg,rgba(255,255,255,0.95) 0%,rgba(255,255,255,0.85) 100%)}
 .set-card-title{font-size:17px;font-weight:800;margin-bottom:6px;letter-spacing:-0.3px}
-.set-card-desc{font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.5;min-height:32px}
+.set-card-desc{font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.5;min-height:32px;flex:1}
 .set-card-meta{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
 .set-card-actions{display:flex;gap:6px;margin-top:14px;padding-top:12px;border-top:1px solid rgba(180,170,210,0.3)}
 
-.badge{display:inline-flex;align-items:center;padding:3px 11px;border-radius:20px;font-size:12px;font-weight:700}
-.badge-purple{background:rgba(66,85,255,0.12);color:#4255ff}
-.badge-orange{background:rgba(240,123,32,0.12);color:var(--orange)}
-.badge-gray{background:rgba(120,110,150,0.12);color:var(--text2)}
+.badge{display:inline-flex;align-items:center;padding:3px 11px;border-radius:20px;font-size:12px;font-weight:700;box-shadow:0 1px 4px rgba(0,0,0,0.05),inset 1px 1px 0 rgba(255,255,255,0.8)}
+.badge-purple{background:linear-gradient(135deg,rgba(66,85,255,0.15) 0%,rgba(66,85,255,0.1) 100%);color:#4255ff}
+.badge-orange{background:linear-gradient(135deg,rgba(240,123,32,0.15) 0%,rgba(240,123,32,0.1) 100%);color:var(--orange)}
+.badge-gray{background:linear-gradient(135deg,rgba(120,110,150,0.15) 0%,rgba(120,110,150,0.1) 100%);color:var(--text2)}
 
 /* Modal */
 .modal-bg{position:fixed;inset:0;z-index:2000;background:rgba(160,150,200,0.4);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;}
@@ -248,12 +320,53 @@ textarea{resize:vertical;min-height:72px;line-height:1.5}
 
 @media(max-width:700px){
   nav{padding:0 16px}
-  .screen{padding:16px}
+  .screen{padding:16px;margin-left:0}
+  .sidebar{width:60px}
+  .sidebar-btn{width:48px;height:48px;font-size:20px}
   .home-hero h1{font-size:32px}
   .two-col{grid-template-columns:1fr}
   .pair-row{grid-template-columns:26px 1fr 26px;grid-template-rows:auto auto}
   .pair-row .pair-col:nth-child(3){grid-column:2}
+  .sets-grid{grid-template-columns:1fr}
 }
+
+.page{display:none}
+.page.active{display:block}
+
+.library-list{display:flex;flex-direction:column;gap:8px}
+.library-item{
+  background:linear-gradient(180deg,rgba(255,255,255,0.8) 0%,rgba(255,255,255,0.6) 100%);
+  border:1px solid var(--glass-border);
+  border-radius:var(--r);
+  padding:16px;
+  cursor:pointer;
+  box-shadow:var(--glass-shadow);
+  transition:all .2s;
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:16px;
+  align-items:center;
+}
+.library-item:hover{transform:translateX(4px);box-shadow:var(--glass-shadow-lg);background:linear-gradient(180deg,rgba(255,255,255,0.95) 0%,rgba(255,255,255,0.85) 100%)}
+.library-item-info h3{font-size:16px;font-weight:800;margin-bottom:4px}
+.library-item-info p{font-size:13px;color:var(--text2);margin-bottom:6px}
+.library-item-meta{display:flex;gap:8px;flex-wrap:wrap}
+
+.vakken-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px}
+.vak-card{
+  background:linear-gradient(135deg,rgba(66,85,255,0.1) 0%,rgba(106,123,255,0.05) 100%);
+  border:1px solid rgba(66,85,255,0.2);
+  border-radius:var(--r2);
+  padding:24px;
+  cursor:pointer;
+  text-align:center;
+  box-shadow:var(--glass-shadow);
+  transition:all .25s;
+}
+.vak-card:hover{transform:translateY(-6px) scale(1.02);box-shadow:var(--glass-shadow-lg);background:linear-gradient(135deg,rgba(66,85,255,0.15) 0%,rgba(106,123,255,0.1) 100%)}
+.vak-card-title{font-size:18px;font-weight:800;margin-bottom:8px;color:var(--accent)}
+.vak-card-count{font-size:28px;font-weight:800;color:#4255ff;margin:12px 0}
+.vak-card-desc{font-size:12px;color:var(--text3)}
 </style>
 </head>
 <body>
@@ -263,6 +376,8 @@ textarea{resize:vertical;min-height:72px;line-height:1.5}
     StudyDeck
   </div>
   <div class="nav-actions">
+    <input type="text" class="search-box" id="search-box" placeholder="Zoek sets... (naam, vak, datum)">
+    <div class="nav-spacer"></div>
     <button class="btn btn-primary btn-sm" onclick="showCreateModal()">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
       Nieuwe set
@@ -270,19 +385,91 @@ textarea{resize:vertical;min-height:72px;line-height:1.5}
   </div>
 </nav>
 
-<div class="screen page-enter">
-  <div class="home-hero">
-    <h1>Leer slimmer,<br><span>niet harder</span></h1>
-    <p>Maak een set, deel de link, en oefen overal.</p>
-    <div class="hero-btns">
-      <button class="btn btn-primary btn-lg" onclick="showCreateModal()">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Nieuwe set
-      </button>
+<div style="display:flex;flex:1">
+  <div class="sidebar">
+    <div class="sidebar-btn active" onclick="showPage('home')" title="Home">
+      🏠
+      <div class="sidebar-label">Home</div>
+    </div>
+    <div class="sidebar-btn" onclick="showPage('library')" title="Bibliotheek">
+      📖
+      <div class="sidebar-label">Library</div>
+    </div>
+    <div class="sidebar-btn" onclick="showPage('vakken')" title="Vakken">
+      🎓
+      <div class="sidebar-label">Vakken</div>
     </div>
   </div>
-  <div id="filter-bar" class="hidden" style="display:none;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:center"></div>
-  <div class="sets-grid" id="sets-grid"></div>
+
+  <div style="flex:1;overflow-y:auto">
+    <!-- HOME PAGE -->
+    <div id="home" class="page active">
+      <div class="screen page-enter">
+        <div class="home-hero">
+          <h1>Leer slimmer</h1>
+          <div class="meta-info">
+            <div class="meta-item">
+              <div class="label">Vandaag</div>
+              <div class="value" id="today-date"></div>
+            </div>
+            <div class="meta-item">
+              <div class="label">Week</div>
+              <div class="value" id="week-number"></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="section-recent" style="display:none">
+          <div class="section-row">
+            <h2>📚 Laatst geoefend</h2>
+          </div>
+          <div class="sets-grid" id="recent-grid"></div>
+        </div>
+
+        <div id="section-recommended">
+          <div class="section-row">
+            <h2>⭐ Aanbevolen voor jou</h2>
+          </div>
+          <div class="sets-grid" id="recommended-grid"></div>
+        </div>
+
+        <div id="section-newest">
+          <div class="section-row">
+            <h2>✨ Nieuw toegevoegd</h2>
+          </div>
+          <div class="sets-grid" id="newest-grid"></div>
+        </div>
+
+        <div id="filter-bar" class="hidden" style="display:none;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:center"></div>
+      </div>
+    </div>
+
+    <!-- LIBRARY PAGE -->
+    <div id="library" class="page">
+      <div class="screen page-enter">
+        <div style="margin-bottom:24px">
+          <h1 style="font-size:32px;font-weight:800;margin-bottom:8px">📖 Bibliotheek</h1>
+          <p style="color:var(--text2)">Alle sets op een rijtje</p>
+        </div>
+        <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap">
+          <button class="btn btn-glass btn-sm" onclick="filterLibrary('all')" id="lib-filter-all" style="border-radius:20px">Alle</button>
+          <div id="lib-filter-vakken"></div>
+        </div>
+        <div class="library-list" id="library-list"></div>
+      </div>
+    </div>
+
+    <!-- VAKKEN PAGE -->
+    <div id="vakken" class="page">
+      <div class="screen page-enter">
+        <div style="margin-bottom:24px">
+          <h1 style="font-size:32px;font-weight:800;margin-bottom:8px">🎓 Vakken</h1>
+          <p style="color:var(--text2)">Sets per vak</p>
+        </div>
+        <div class="vakken-grid" id="vakken-grid"></div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <div id="modal-bg" class="modal-bg hidden" onclick="if(event.target===this)closeModal()">
@@ -340,27 +527,63 @@ async function loadSetsFromDirectory(){
 }
 
 /* ══════════════════════════════════════════════════════
-   RENDER HOME
+   HOMEPAGE & NAVIGATION
 ══════════════════════════════════════════════════════ */
-function renderHome(){
-  const vakken=[...new Set(DB.sets.map(s=>s.vak).filter(Boolean))];
-  const fb=document.getElementById('filter-bar');
-  if(vakken.length){
-    fb.style.display='flex';fb.classList.remove('hidden');
-    fb.innerHTML=`<span style="font-size:13px;color:var(--text2);font-weight:700">Filter:</span>
-      <button class="btn btn-glass btn-sm" onclick="renderGrid(DB.sets)" style="border-radius:20px">Alle</button>
-      ${vakken.map(v=>`<button class="btn btn-glass btn-sm" onclick="renderGrid(DB.sets.filter(s=>s.vak==='${esc(v)}'))" style="border-radius:20px">${esc(v)}</button>`).join('')}`;
-  }
-  renderGrid(DB.sets);
+let currentPage = 'home';
+let libraryFilter = 'all';
+let searchQuery = '';
+
+function showPage(page) {
+  currentPage = page;
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(page).classList.add('active');
+  document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.sidebar-btn').forEach((b, i) => {
+    if ((i === 0 && page === 'home') || (i === 1 && page === 'library') || (i === 2 && page === 'vakken')) {
+      b.classList.add('active');
+    }
+  });
+  if (page === 'library') renderLibrary();
+  else if (page === 'vakken') renderVakken();
+  else if (page === 'home') renderHome();
 }
 
-function renderGrid(sets){
-  const el=document.getElementById('sets-grid');
-  if(!sets.length){
-    el.innerHTML=`<div style="text-align:center;padding:60px 20px;color:var(--text2);grid-column:1/-1"><div style="font-size:48px;margin-bottom:16px">📚</div><div style="font-size:20px;font-weight:800;margin-bottom:8px">Geen sets</div><p>Maak een nieuwe set aan.</p></div>`;
-    return;
+function getWeekNumber(d = new Date()) {
+  d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+  d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay()||7));
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
+  const weekNum = Math.ceil((((d - yearStart) / 86400000) + 1)/7);
+  return weekNum;
+}
+
+function renderHome(){
+  const today = new Date();
+  const opts = {weekday:'long', year:'numeric', month:'long', day:'numeric'};
+  document.getElementById('today-date').textContent = today.toLocaleDateString('nl-NL', opts).split(',')[0];
+  document.getElementById('week-number').textContent = `Week ${getWeekNumber(today)}`;
+  
+  const recentKey = 'sd_recent_sets';
+  let recent = [];
+  try { recent = JSON.parse(localStorage.getItem(recentKey) || '[]'); } catch(e) {}
+  recent = recent.filter(id => DB.sets.find(s => s.id === id)).slice(0, 3);
+  
+  const recentSets = recent.map(id => DB.sets.find(s => s.id === id)).filter(Boolean);
+  if (recentSets.length) {
+    document.getElementById('section-recent').style.display = 'block';
+    renderSetGrid('recent-grid', recentSets);
   }
-  el.innerHTML=sets.map(s=>`
+  
+  const recommended = DB.sets.filter(s => s.vak).sort(() => Math.random() - 0.5).slice(0, 3);
+  if (recommended.length) renderSetGrid('recommended-grid', recommended);
+  
+  const newest = [...DB.sets].sort((a, b) => (b.id || '').localeCompare(a.id || '')).slice(0, 3);
+  if (newest.length) renderSetGrid('newest-grid', newest);
+}
+
+function renderSetGrid(elementId, sets) {
+  const el = document.getElementById(elementId);
+  if (!el || !sets.length) return;
+  el.innerHTML = sets.map(s => `
     <div class="set-card" onclick="openSet('${s.id}')">
       <div class="set-card-title">${esc(s.title)}</div>
       <div class="set-card-desc">${esc(s.description||'')}</div>
@@ -378,10 +601,91 @@ function renderGrid(sets){
   `).join('');
 }
 
+function renderLibrary() {
+  const vakken = [...new Set(DB.sets.map(s => s.vak).filter(Boolean))];
+  const vakkenContainer = document.getElementById('lib-filter-vakken');
+  if (vakkenContainer) {
+    vakkenContainer.innerHTML = vakken.map(v => 
+      `<button class="btn btn-glass btn-sm" onclick="filterLibrary('${esc(v)}')" id="lib-filter-${esc(v)}" style="border-radius:20px">${esc(v)}</button>`
+    ).join('');
+  }
+  
+  let sets = [...DB.sets];
+  if (libraryFilter !== 'all') {
+    sets = sets.filter(s => s.vak === libraryFilter);
+  }
+  if (searchQuery) {
+    sets = sets.filter(s => 
+      s.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (s.vak && s.vak.toLowerCase().includes(searchQuery.toLowerCase()))
+    );
+  }
+  sets.sort((a, b) => (b.id || '').localeCompare(a.id || ''));
+  
+  const el = document.getElementById('library-list');
+  if (!el) return;
+  el.innerHTML = sets.map(s => `
+    <div class="library-item" onclick="openSet('${s.id}')">
+      <div class="library-item-info">
+        <h3>${esc(s.title)}</h3>
+        <p>${esc(s.description || 'Geen omschrijving')}</p>
+        <div class="library-item-meta">
+          <span class="badge badge-purple">${s.terms.length} begrippen</span>
+          ${s.vak?`<span class="badge badge-orange">${esc(s.vak)}</span>`:''}
+        </div>
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="event.stopPropagation();openSet('${s.id}')">Oefenen →</button>
+    </div>
+  `).join('') || '<div style="text-align:center;padding:40px;color:var(--text2)">Geen sets gevonden</div>';
+}
+
+function renderVakken() {
+  const vakken = [...new Set(DB.sets.map(s => s.vak).filter(Boolean))].sort();
+  const el = document.getElementById('vakken-grid');
+  el.innerHTML = vakken.map(v => {
+    const count = DB.sets.filter(s => s.vak === v).length;
+    return `
+      <div class="vak-card" onclick="goToVakLibrary('${esc(v)}')">
+        <div class="vak-card-title">${esc(v)}</div>
+        <div class="vak-card-count">${count}</div>
+        <div class="vak-card-desc">sets om te oefenen</div>
+      </div>
+    `;
+  }).join('');
+}
+
+function goToVakLibrary(vak) {
+  showPage('library');
+  libraryFilter = vak;
+  filterLibrary(vak);
+}
+
+function filterLibrary(filter) {
+  libraryFilter = filter;
+  document.querySelectorAll('[id^="lib-filter-"]').forEach(b => b.classList.remove('active'));
+  document.getElementById('lib-filter-' + filter).classList.add('active');
+  renderLibrary();
+}
+
+
+
 function openSet(id){
   const s=DB.sets.find(x=>x.id===id);if(!s)return;
   const slug=s.slug||toSlug(s.title);s.slug=slug;saveDB();
+  const recentKey='sd_recent_sets';
+  let recent=[];try{recent=JSON.parse(localStorage.getItem(recentKey)||'[]');}catch(e){}
+  recent=recent.filter(r=>r!==id);recent.unshift(id);recent=recent.slice(0,10);
+  localStorage.setItem(recentKey,JSON.stringify(recent));
   window.location.href=`set.html?set=${encodeURIComponent(slug)}`;
+}
+
+function setupSearch(){
+  const searchBox=document.getElementById('search-box');
+  if(!searchBox)return;
+  searchBox.addEventListener('input',(e)=>{
+    searchQuery=e.target.value.trim();
+    if(currentPage==='library')renderLibrary();
+  });
 }
 function toSlug(str){
   return str.toLowerCase()
@@ -933,7 +1237,7 @@ function esc(s) { if(!s)return''; return String(s).replace(/&/g,'&amp;').replace
    BOOT
 ══════════════════════════════════════════════════════ */
 initDB();
-loadSetsFromDirectory().then(() => renderHome());
+loadSetsFromDirectory().then(() => { renderHome(); setupSearch(); });
 
 window.debugDb = function(){
   console.log('Sets in memory:', DB.sets.length, DB.sets);
