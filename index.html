@@ -481,7 +481,7 @@ function ceRemoveImage(idx,imgIdx){
 function ceRenderPairs(){
   const el=document.getElementById('ce-pairs');
   if(!el)return;
-  const activeInputId=document.activeElement?.id; // Remember which input had focus
+  const activeInputId=document.activeElement?.id;
   el.innerHTML=CE.pairs.map((p,i)=>`
     <div class="pair-row" style="flex-wrap:wrap">
       <div class="pair-num">${i+1}</div>
@@ -493,11 +493,11 @@ function ceRenderPairs(){
           style="min-width:100%">
         <div class="format-toolbar" id="fmt-term-${i}" style="gap:4px">
           <div class="color-palette">${PRESET_COLORS.map(c=>`
-            <div class="color-swatch ${p.activeTermColor===c?'active':''}" style="background:${c}" onclick="ceToggleColor(${i},'term','${c}');document.getElementById('ce-term-${i}').focus()" title="Kleur"></div>
+            <div class="color-swatch ${p.activeTermColor===c?'active':''}" style="background:${c}" onmousedown="event.preventDefault();ceToggleColor(${i},'term','${c}');document.getElementById('ce-term-${i}').focus()" title="Kleur"></div>
           `).join('')}</div>
-          <button class="format-btn ${p.activeTermBold?'active':''}" onclick="ceToggleBold(${i},'term');document.getElementById('ce-term-${i}').focus()" title="Vet">B</button>
-          <button class="format-btn ${p.activeTermItalic?'active':''}" onclick="ceToggleItalic(${i},'term');document.getElementById('ce-term-${i}').focus()" title="Cursief">I</button>
-          <button class="image-upload-btn" style="margin-left:auto" onclick="ceUploadImage(${i},'term')">🖼️ Afb.</button>
+          <button class="format-btn ${p.activeTermBold?'active':''}" onmousedown="event.preventDefault();ceToggleBold(${i},'term');document.getElementById('ce-term-${i}').focus()" title="Vet">B</button>
+          <button class="format-btn ${p.activeTermItalic?'active':''}" onmousedown="event.preventDefault();ceToggleItalic(${i},'term');document.getElementById('ce-term-${i}').focus()" title="Cursief">I</button>
+          <button class="image-upload-btn" style="margin-left:auto" onmousedown="event.preventDefault();ceUploadImage(${i},'term');document.getElementById('ce-term-${i}').focus()">🖼️ Afb.</button>
         </div>
         ${p.images&&p.images.length?`<div class="image-gallery">${p.images.map((img,j)=>`<img src="data:image/png;base64,${img.base64}" class="image-thumb" onclick="ceRemoveImage(${i},${j})" title="Klik om te verwijderen">`).join('')}</div>`:''}
       </div>
@@ -509,18 +509,17 @@ function ceRenderPairs(){
           style="min-width:100%">
         <div class="format-toolbar" id="fmt-def-${i}" style="gap:4px">
           <div class="color-palette">${PRESET_COLORS.map(c=>`
-            <div class="color-swatch ${p.activeDefColor===c?'active':''}" style="background:${c}" onclick="ceToggleColor(${i},'def','${c}');document.getElementById('ce-def-${i}').focus()" title="Kleur"></div>
+            <div class="color-swatch ${p.activeDefColor===c?'active':''}" style="background:${c}" onmousedown="event.preventDefault();ceToggleColor(${i},'def','${c}');document.getElementById('ce-def-${i}').focus()" title="Kleur"></div>
           `).join('')}</div>
-          <button class="format-btn ${p.activeDefBold?'active':''}" onclick="ceToggleBold(${i},'def');document.getElementById('ce-def-${i}').focus()" title="Vet">B</button>
-          <button class="format-btn ${p.activeDefItalic?'active':''}" onclick="ceToggleItalic(${i},'def');document.getElementById('ce-def-${i}').focus()" title="Cursief">I</button>
-          <button class="image-upload-btn" style="margin-left:auto" onclick="ceUploadImage(${i},'def')">🖼️ Afb.</button>
+          <button class="format-btn ${p.activeDefBold?'active':''}" onmousedown="event.preventDefault();ceToggleBold(${i},'def');document.getElementById('ce-def-${i}').focus()" title="Vet">B</button>
+          <button class="format-btn ${p.activeDefItalic?'active':''}" onmousedown="event.preventDefault();ceToggleItalic(${i},'def');document.getElementById('ce-def-${i}').focus()" title="Cursief">I</button>
+          <button class="image-upload-btn" style="margin-left:auto" onmousedown="event.preventDefault();ceUploadImage(${i},'def');document.getElementById('ce-def-${i}').focus()">🖼️ Afb.</button>
         </div>
         ${p.images&&p.images.length?`<div class="image-gallery">${p.images.map((img,j)=>`<img src="data:image/png;base64,${img.base64}" class="image-thumb" onclick="ceRemoveImage(${i},${j})" title="Klik om te verwijderen">`).join('')}</div>`:''}
       </div>
       <button class="pair-del" onclick="ceRemove(${i})">×</button>
     </div>
   `).join('');
-  // Restore focus to the same input if it still exists
   if(activeInputId) setTimeout(()=>{const el=document.getElementById(activeInputId); if(el) el.focus();},0);
 }
 
@@ -568,7 +567,7 @@ function ceToggleColor(idx,type,color){
     pair[activeKey]=color;
   }
   ceRenderPairs();
-  showToast(pair[activeKey]?'Kleur ingeschakeld':'Kleur uitgeschakeld');
+  showToast(pair[activeKey]?'🎨 Kleur ingeschakeld':'🎨 Kleur uitgeschakeld');
 }
 
 function ceToggleBold(idx,type){
@@ -576,7 +575,7 @@ function ceToggleBold(idx,type){
   const activeKey=type==='term'?'activeTermBold':'activeDefBold';
   pair[activeKey]=!pair[activeKey];
   ceRenderPairs();
-  showToast(pair[activeKey]?'Vet ingeschakeld':'Vet uitgeschakeld');
+  showToast(pair[activeKey]?'<b>Vet ingeschakeld</b>':'<b>Vet uitgeschakeld</b>');
 }
 
 function ceToggleItalic(idx,type){
@@ -584,7 +583,7 @@ function ceToggleItalic(idx,type){
   const activeKey=type==='term'?'activeTermItalic':'activeDefItalic';
   pair[activeKey]=!pair[activeKey];
   ceRenderPairs();
-  showToast(pair[activeKey]?'Cursief ingeschakeld':'Cursief uitgeschakeld');
+  showToast(pair[activeKey]?'<i>Cursief ingeschakeld</i>':'<i>Cursief uitgeschakeld</i>');
 }
 function ceAdd(){
   CE.pairs.push({
@@ -595,7 +594,35 @@ function ceAdd(){
   ceRenderPairs();
   setTimeout(()=>{const rows=document.querySelectorAll('#ce-pairs .pair-row');rows[rows.length-1]?.querySelector('input')?.focus();},50);
 }
+
 function ceRemove(i){if(CE.pairs.length<=1){showToast('Minimaal 1 begrip vereist');return;}CE.pairs.splice(i,1);ceRenderPairs();}
+
+// Keyboard shortcuts for formatting (Ctrl+B, Ctrl+I)
+document.addEventListener('keydown', e => {
+  if(!CE.pairs) return; // Niet in edit mode
+  const input = document.activeElement;
+  if(input?.tagName !== 'INPUT' || !input?.id?.startsWith('ce-')) return;
+
+  // Parse input id: ce-term-0 or ce-def-0
+  const match = input.id.match(/^ce-(term|def)-(\d+)$/);
+  if(!match) return;
+
+  const [, type, idx] = match;
+  const i = parseInt(idx);
+
+  if(e.ctrlKey || e.metaKey) { // Ctrl on Windows/Linux, Cmd on Mac
+    if(e.key === 'b' || e.key === 'B') {
+      e.preventDefault();
+      ceToggleBold(i, type);
+      input.focus(); // Keep focus
+    }
+    else if(e.key === 'i' || e.key === 'I') {
+      e.preventDefault();
+      ceToggleItalic(i, type);
+      input.focus();
+    }
+  }
+});
 
 function ceSave(){
   const title=document.getElementById('c-title').value.trim();
