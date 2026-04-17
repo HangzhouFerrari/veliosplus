@@ -361,7 +361,6 @@ function showCreateModal(id){
   const s=id?DB.sets.find(x=>x.id===id):null;
   CE.pairs=s?s.terms.map(t=>{
     const term={...t};
-    // Migrate old term-level formatting to segments if needed
     if(!term.termSegments&&(term.termColor||term.termBold||term.termItalic)){
       term.termSegments=[{text:term.term,color:term.termColor,bold:term.termBold,italic:term.termItalic}];
     }
@@ -371,17 +370,12 @@ function showCreateModal(id){
     return term;
   }):[{term:'',def:''},{term:'',def:''}];
 
-  // Try to load draft if editing new set
   if(!id){
     const draft=JSON.parse(localStorage.getItem('sd_draft')||'null');
-    if(draft){
+    if(draft && draft.pairs){
       CE.pairs=draft.pairs;
-      document.getElementById('c-title')?.value=draft.title||'';
-      document.getElementById('c-vak')?.value=draft.vak||'';
-      document.getElementById('c-desc')?.value=draft.desc||'';
-      document.getElementById('c-datum')?.value=draft.datum||'';
-      showToast('📋 Concept hersteld!');
-      setTimeout(()=>localStorage.removeItem('sd_draft'),500); // Clear after loading
+      setTimeout(()=>showToast('📋 Concept hersteld!'),100);
+      setTimeout(()=>localStorage.removeItem('sd_draft'),500);
     }
   }
 
@@ -395,12 +389,12 @@ function showCreateModal(id){
       </div>
     </h3>
     <div class="two-col" style="margin-bottom:12px">
-      <div class="input-group"><label>Titel *</label><input id="c-title" type="text" placeholder="Bijv. Biologie H3" value="${esc(s?.title||'')}" oninput="ceSaveDraft()"></div>
-      <div class="input-group"><label>Vak</label><input id="c-vak" type="text" placeholder="Bijv. Wiskunde" value="${esc(s?.vak||'')}" oninput="ceSaveDraft()"></div>
+      <div class="input-group"><label>Titel *</label><input id="c-title" type="text" placeholder="Bijv. Biologie H3" value="${esc(s?.title||'')}"></div>
+      <div class="input-group"><label>Vak</label><input id="c-vak" type="text" placeholder="Bijv. Wiskunde" value="${esc(s?.vak||'')}"></div>
     </div>
     <div class="two-col" style="margin-bottom:16px">
-      <div class="input-group"><label>Omschrijving</label><textarea id="c-desc" style="min-height:56px" oninput="ceSaveDraft()">${esc(s?.description||'')}</textarea></div>
-      <div class="input-group"><label>Datum</label><input id="c-datum" type="date" value="${esc(s?.datum||'')}" oninput="ceSaveDraft()"></div>
+      <div class="input-group"><label>Omschrijving</label><textarea id="c-desc" style="min-height:56px">${esc(s?.description||'')}</textarea></div>
+      <div class="input-group"><label>Datum</label><input id="c-datum" type="date" value="${esc(s?.datum||'')}"></div>
     </div>
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
       <div style="font-size:15px;font-weight:800">Begrippen</div>
