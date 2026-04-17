@@ -179,6 +179,83 @@ let DB={sets:[]};
 function initDB(){try{DB.sets=JSON.parse(localStorage.getItem('sd_sets')||'[]');}catch(e){DB.sets=[];}}
 function saveDB(){try{localStorage.setItem('sd_sets',JSON.stringify(DB.sets));}catch(e){}}
 
+/* ══ LOAD SETS FROM /sets/ DIRECTORY ══ */
+async function loadSetsFromDirectory(){
+  try{
+    // Try to load sets list from sets/index.json
+    const indexResp=await fetch('sets/index.json');
+    if(indexResp.ok){
+      const fileList=await indexResp.json();
+
+      for(const filename of fileList){
+        try{
+          const sr=await fetch('sets/'+encodeURIComponent(filename));
+          if(sr.ok){
+            const content=await sr.text();
+            let set=null;
+
+            // Try to decode as .vset (base64 + XOR)
+            try{set=decodeVset(content.trim());}
+            catch{
+              // Try plain JSON
+              try{set=JSON.parse(content.trim());}
+              catch(e){}
+            }
+
+            if(set&&set.title){
+              // Check if already exists in DB
+              const exists=DB.sets.find(x=>x.id===set.id||x.slug===set.slug);
+              if(!exists){
+                // Normalize and add
+                if(!set.id)set.id='srv_'+Date.now();
+                if(!set.slug)set.slug=toSlug(set.title);
+                if(!set.terms)set.terms=[];
+                DB.sets.push(set);
+              }
+            }
+          }
+        }catch(e){console.log('Error loading '+filename+': '+e.message)}
+      }
+    }
+  }catch(e){console.log('Could not load sets/index.json:',e.message)}
+
+  // Fallback: Try directory listing
+  try{
+    const resp=await fetch('sets/');
+    if(!resp.ok)return;
+
+    const text=await resp.text();
+    const parser=new DOMParser();
+    const doc=parser.parseFromString(text,'text/html');
+    const links=doc.querySelectorAll('a[href*=".vset"]');
+
+    for(const link of links){
+      const filename=link.getAttribute('href');
+      if(filename.endsWith('.vset')){
+        try{
+          const sr=await fetch('sets/'+encodeURIComponent(filename));
+          if(sr.ok){
+            const content=await sr.text();
+            let set=null;
+            try{set=decodeVset(content.trim());}
+            catch{try{set=JSON.parse(content.trim());}catch(e){}}
+
+            if(set&&set.title){
+              const exists=DB.sets.find(x=>x.id===set.id||x.slug===set.slug);
+              if(!exists){
+                if(!set.id)set.id='srv_'+Date.now();
+                if(!set.slug)set.slug=toSlug(set.title);
+                if(!set.terms)set.terms=[];
+                DB.sets.push(set);
+              }
+            }
+          }
+        }catch(e){}
+      }
+    }
+  }catch(e){}
+}
+
 /* ══ RENDER ══ */
 function renderHome(){
   const vakken=[...new Set(DB.sets.map(s=>s.vak).filter(Boolean))];
@@ -348,7 +425,7 @@ function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/<
 
 /* ══ BOOT ══ */
 initDB();
-renderHome();
+loadSetsFromDirectory().then(()=>renderHome());
 </script>
 </body>
 </html>
