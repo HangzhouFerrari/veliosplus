@@ -320,12 +320,15 @@ async function loadSetsFromDirectory(){
             let set=null;
             try{set=decodeVset(content.trim());}catch{try{set=JSON.parse(content.trim());}catch(e){}}
             if(set&&set.title){
-              const exists=DB.sets.find(x=>x.id===set.id||x.slug===set.slug);
-              if(!exists){
-                if(!set.id)set.id='srv_'+Date.now();
-                if(!set.slug)set.slug=toSlug(set.title);
-                if(!set.terms)set.terms=[];
-                set.fromServer=true;
+              set._serverFile=filename;
+              if(!set.id)set.id='srv_'+filename;
+              if(!set.slug)set.slug=toSlug(set.title);
+              if(!set.terms)set.terms=[];
+              set.fromServer=true;
+              const existIdx=DB.sets.findIndex(x=>x._serverFile===filename);
+              if(existIdx>=0){
+                DB.sets[existIdx]=set;
+              }else{
                 DB.sets.push(set);
               }
             }
