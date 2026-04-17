@@ -228,13 +228,14 @@ textarea{resize:vertical;min-height:72px;line-height:1.5}
 
 /* Modal */
 .modal-bg{position:fixed;inset:0;z-index:2000;background:rgba(160,150,200,0.4);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;}
-.modal-panel{background:rgba(252,250,255,0.99);border:1.5px solid rgba(200,195,230,0.8);border-radius:var(--r2);padding:28px;width:90%;max-width:860px;max-height:92vh;overflow-y:auto;box-shadow:0 16px 64px rgba(80,60,160,0.2);animation:slideUp .35s var(--ease2);}
+.modal-panel{background:rgba(252,250,255,0.99);border:1.5px solid rgba(200,195,230,0.8);border-radius:var(--r2);padding:28px;width:90%;max-width:860px;max-height:92vh;overflow-y:auto;box-shadow:0 16px 64px rgba(80,60,160,0.2);animation:slideUp .35s var(--ease2);transition:all .4s var(--ease2);}
 .modal-panel h3{font-size:20px;font-weight:800;margin-bottom:16px;letter-spacing:-0.3px;display:flex;align-items:center;justify-content:space-between}
 .modal-header-actions{display:flex;gap:4px}
 .modal-header-btn{width:32px;height:32px;display:inline-flex;align-items:center;justify-content:center;background:rgba(66,85,255,0.08);border:none;cursor:pointer;border-radius:8px;color:var(--text2);transition:all .15s;font-size:16px}
 .modal-header-btn:hover{background:rgba(66,85,255,0.15);color:var(--accent)}
 .modal-footer{display:flex;gap:8px;justify-content:flex-end;margin-top:20px;padding-top:16px;border-top:1px solid rgba(180,170,210,0.2)}
 .modal-bg.modal-maximized .modal-panel{width:98%;max-width:none;max-height:97vh;border-radius:var(--r)}
+.modal-bg.modal-fullscreen .modal-panel{width:100%;max-width:none;height:100vh;max-height:100vh;border-radius:0;border:none}
 
 #toast{position:fixed;bottom:24px;right:24px;z-index:9999;background:rgba(252,250,255,0.99);border:1px solid rgba(200,195,230,0.7);border-radius:var(--r);padding:12px 20px;font-size:14px;font-weight:700;box-shadow:0 8px 32px rgba(80,60,160,0.2);opacity:0;transform:translateY(12px);pointer-events:none;transition:all .25s var(--ease2);}
 #toast.show{opacity:1;transform:translateY(0)}
@@ -666,11 +667,11 @@ function bindPairEvents(container) {
 /* ══════════════════════════════════════════════════════
    CREATE / EDIT MODAL
 ══════════════════════════════════════════════════════ */
-let CE = { id: null, pairs: [], isMaximized: false };
+let CE = { id: null, pairs: [], viewMode: 0 }; // 0: klein, 1: breed, 2: volledig
 
 function showCreateModal(id) {
   CE.id = id || null;
-  CE.isMaximized = false;
+  CE.viewMode = 0;
   let s = id ? DB.sets.find(x => x.id === id) : null;
 
   if (!id) {
@@ -727,6 +728,7 @@ function showCreateModal(id) {
     <button class="btn btn-glass" style="width:100%;margin-top:8px" onclick="ceAdd()">+ Begrip toevoegen</button>
 
     <div class="modal-footer">
+      <button class="btn btn-sm" style="background:rgba(232,58,74,0.1);color:var(--red);margin-right:auto" onclick="ceClearDraft()">Concept verwijderen</button>
       <button class="btn btn-glass" onclick="closeModal()">Annuleren</button>
       <button class="btn btn-primary" onclick="ceSave()">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
@@ -739,10 +741,21 @@ function showCreateModal(id) {
 }
 
 function toggleMaximize() {
-  CE.isMaximized = !CE.isMaximized;
-  document.getElementById('modal-bg').classList.toggle('modal-maximized', CE.isMaximized);
+  CE.viewMode = (CE.viewMode + 1) % 3;
+  const bg = document.getElementById('modal-bg');
   const btn = document.querySelector('.modal-header-btn');
-  if (btn) btn.textContent = CE.isMaximized ? '⊞' : '↗';
+  
+  bg.classList.remove('modal-maximized', 'modal-fullscreen');
+
+  if (CE.viewMode === 1) {
+    bg.classList.add('modal-maximized');
+    if (btn) btn.textContent = '⬜'; 
+  } else if (CE.viewMode === 2) {
+    bg.classList.add('modal-fullscreen');
+    if (btn) btn.textContent = '↘'; 
+  } else {
+    if (btn) btn.textContent = '↗'; 
+  }
 }
 
 function ceRenderPairs() {
@@ -766,6 +779,16 @@ function ceSaveDraft() {
     pairs: CE.pairs
   };
   localStorage.setItem('sd_draft', JSON.stringify(draft));
+}
+
+function ceClearDraft() {
+  if (!confirm('Weet je zeker dat je alle velden wilt leegmaken?')) return;
+  localStorage.removeItem('sd_draft');
+  CE.pairs = [{ term:'', def:'' }, { term:'', def:'' }];
+  document.getElementById('c-title').value = '';
+  document.getElementById('c-vak').value = '';
+  document.getElementById('c-desc').value = '';
+  ceRenderPairs();
 }
 
 function ceAdd() {
@@ -890,9 +913,9 @@ function showModal(html) {
   document.getElementById('modal-bg').classList.remove('hidden');
 }
 function closeModal() {
-  CE.isMaximized = false;
+  CE.viewMode = 0;
   document.getElementById('modal-bg').classList.add('hidden');
-  document.getElementById('modal-bg').classList.remove('modal-maximized');
+  document.getElementById('modal-bg').classList.remove('modal-maximized', 'modal-fullscreen');
 }
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
