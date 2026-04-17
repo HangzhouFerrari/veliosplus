@@ -210,6 +210,7 @@ async function loadSetsFromDirectory(){
                 if(!set.id)set.id='srv_'+Date.now();
                 if(!set.slug)set.slug=toSlug(set.title);
                 if(!set.terms)set.terms=[];
+                set.fromServer=true; // Mark as server set - cannot be deleted
                 DB.sets.push(set);
               }
             }
@@ -246,6 +247,7 @@ async function loadSetsFromDirectory(){
                 if(!set.id)set.id='srv_'+Date.now();
                 if(!set.slug)set.slug=toSlug(set.title);
                 if(!set.terms)set.terms=[];
+                set.fromServer=true; // Mark as server set - cannot be deleted
                 DB.sets.push(set);
               }
             }
@@ -292,7 +294,7 @@ function renderGrid(sets){
       <div class="set-card-actions" onclick="event.stopPropagation()">
         <button class="btn btn-glass btn-sm" onclick="openSet('${s.id}')">Oefenen</button>
         <button class="btn btn-glass btn-sm" onclick="showEditModal('${s.id}')">Bewerken</button>
-        <button class="btn btn-sm" style="background:rgba(232,58,74,0.1);color:var(--red);border:none;border-radius:8px;padding:6px 10px;font-family:var(--font);font-weight:700;cursor:pointer" onclick="confirmDelete('${s.id}')">✕</button>
+        ${s.fromServer?`<span class="badge badge-gray" title="Server set - kan niet verwijderd worden">🔒 Geblokkeerd</span>`:`<button class="btn btn-sm" style="background:rgba(232,58,74,0.1);color:var(--red);border:none;border-radius:8px;padding:6px 10px;font-family:var(--font);font-weight:700;cursor:pointer" onclick="confirmDelete('${s.id}')">✕</button>`}
       </div>
     </div>
   `).join('');
@@ -401,6 +403,9 @@ function ceSave(){
 
 /* ══ DELETE ══ */
 function confirmDelete(id){
+  const s=DB.sets.find(x=>x.id===id);
+  if(!s)return;
+  if(s.fromServer){showToast('Deze set is van de server - kan niet verwijderd worden');return;}
   showModal(`
     <h3>Set verwijderen?</h3>
     <p style="color:var(--text2);margin-bottom:20px">Dit kan niet ongedaan worden gemaakt.</p>
@@ -410,7 +415,7 @@ function confirmDelete(id){
     </div>
   `);
 }
-function doDelete(id){DB.sets=DB.sets.filter(s=>s.id!==id);saveDB();closeModal();renderHome();showToast('Set verwijderd');}
+function doDelete(id){DB.sets=DB.sets.filter(s=>s.id!==id);saveDB();closeModal();renderHome();showToast('Set verwijderd')}
 
 /* ══ MODAL ══ */
 function showModal(html){document.getElementById('modal-panel').innerHTML=html;document.getElementById('modal-bg').classList.remove('hidden');}
