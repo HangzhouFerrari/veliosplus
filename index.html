@@ -711,7 +711,7 @@ function setupSearch(){
     }
     
     // Secret feature: type 'developer' to go to developer.html
-    if(query==='developer'){
+    if(query==='dev'){
       dropdown.innerHTML='<div style="padding:16px;text-align:center;color:var(--text2);font-size:14px">Geen resultaten gevonden</div>';
       updateDropdownPosition();
       dropdown.style.display='block';
@@ -751,7 +751,7 @@ function setupSearch(){
   searchBox.addEventListener('keydown',(e)=>{
     if(e.key==='Enter'){
       const query=searchBox.value.trim().toLowerCase();
-      if(query==='developer'){
+      if(query==='dev'){
         window.location.href='developer.html';
       }
     }
