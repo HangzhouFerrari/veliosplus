@@ -218,27 +218,40 @@ function loadThemeSettings(){
     if(saved){
       const root=document.documentElement.style;
       if(saved.darkMode){
-        root.setProperty('--bg-grad','linear-gradient(160deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%)');
-        root.setProperty('--glass','rgba(20,20,40,0.85)');
-        root.setProperty('--glass2','rgba(15,15,35,0.80)');
-        root.setProperty('--text','#f0f0f0');
-        root.setProperty('--text2','#b0b0c0');
-        root.setProperty('--text3','#888899');
-        root.setProperty('--glass-border','rgba(100,100,150,0.3)');
+        root.setProperty('--bg-grad','linear-gradient(180deg, rgb(10, 10, 10) 0%, rgb(10, 8, 18) 100%)');
+        root.setProperty('--glass','rgb(34, 33, 41)');
+        root.setProperty('--glass2','rgba(34,33,41,0.90)');
+        root.setProperty('--text','#ffffff');
+        root.setProperty('--text2','#e9e9e9');
+        root.setProperty('--text3','rgba(255,255,255,0.65)');
+        root.setProperty('--glass-border','rgba(64,73,112,0.557)');
+        root.setProperty('--glass-shadow','0 0px 10px rgba(0,5,48,0.8), inset 1px 1px 0 rgba(88,93,120,0.9)');
+        root.setProperty('--glass-shadow-lg','0 8px 32px rgba(0,5,48,0.8), inset 1px 1px 0 rgba(88,93,120,0.9)');
       }
       if(saved.accentColor&&saved.accentColor!=='#0062ff'){
         root.setProperty('--accent',saved.accentColor);
-        root.setProperty('--accent-light',saved.accentColor+'1f');
+        const hex=saved.accentColor.replace('#','');
+        const r=parseInt(hex.substr(0,2),16);
+        const g=parseInt(hex.substr(2,2),16);
+        const b=parseInt(hex.substr(4,2),16);
+        root.setProperty('--accent-light',`rgba(${r},${g},${b},0.12)`);
       }
     }
   }catch(e){}
 }
 
 /* ── DROPDOWN TOGGLE ── */
-let openDD=null;
-function toggleDD(id){const el=document.getElementById(id);if(!el)return;if(openDD&&openDD!==id)closeDD(openDD);if(el.style.display==='none'||!el.style.display){el.style.display='block';openDD=id;}else closeDD(id);}
-function closeDD(id){const el=document.getElementById(id);if(el)el.style.display='none';if(openDD===id)openDD=null;}
-document.addEventListener('click',e=>{if(openDD&&!e.target.closest('.settings-dropdown-wrap'))closeDD(openDD);});
+function toggleDD(id){
+  const el=document.getElementById(id);
+  if(!el)return;
+  const isOpen=el.style.display==='block';
+  document.querySelectorAll('[id$="-menu"]').forEach(d=>{d.style.display='none';});
+  if(!isOpen)el.style.display='block';
+}
+document.addEventListener('click',(e)=>{
+  if(e.target.closest('.settings-dropdown-wrap'))return;
+  document.querySelectorAll('[id$="-menu"]').forEach(dd=>{dd.style.display='none';});
+});
 
 let SET=null,currentMode='home';
 
@@ -730,12 +743,6 @@ document.addEventListener('keydown',e=>{
   }
 });
 
-/* ── DROPDOWN ── */
-let openDD=null;
-function toggleDD(id){const el=document.getElementById(id);if(!el)return;if(openDD&&openDD!==id)closeDD(openDD);if(el.style.display==='none'||!el.style.display){el.style.display='block';openDD=id;}else closeDD(id);}
-function closeDD(id){const el=document.getElementById(id);if(el)el.style.display='none';if(openDD===id)openDD=null;}
-document.addEventListener('click',e=>{if(openDD&&!e.target.closest('.settings-dropdown-wrap'))closeDD(openDD);});
-
 /* ── SET ACTIONS ── */
 function showShareModal(){
   const url=`${window.location.origin}${window.location.pathname}?set=${encodeURIComponent(SET.slug)}`;
@@ -743,8 +750,8 @@ function showShareModal(){
   showModal(`
     <h3 style="margin-bottom:16px">Delen</h3>
     <div style="display:flex;gap:8px;margin-bottom:12px">
-      <input type="text" value="${esc(url)}" readonly style="flex:1;padding:10px;border:1px solid rgba(200,195,230,0.6);border-radius:8px;font-size:13px;background:rgba(255,255,255,0.7)">
-      <button class="btn btn-primary btn-sm" onclick="copyToClipboard('${escA(url)}')">📋 Kopie</button>
+      <input type="text" id="share-url" value="${esc(url)}" readonly style="flex:1;padding:10px;border:1px solid rgba(200,195,230,0.6);border-radius:8px;font-size:13px;background:rgba(255,255,255,0.7)">
+      <button class="btn btn-primary btn-sm" onclick="document.getElementById('share-url')&&navigator.clipboard.writeText(document.getElementById('share-url').value).then(()=>showToast('✓ Gekopieerd!')).catch(()=>showToast('Kopiëren mislukt'))">📋 Kopie</button>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
       <button class="btn btn-glass btn-sm" onclick="window.open('https://wa.me/?text=${encodeURIComponent(shareText+' '+url)}','_blank')">WhatsApp</button>
@@ -756,10 +763,6 @@ function showShareModal(){
       <button class="btn btn-glass" onclick="closeModal()">Sluiten</button>
     </div>
   `);
-}
-
-function copyToClipboard(text){
-  navigator.clipboard.writeText(text).then(()=>showToast('✓ Gekopieerd!')).catch(()=>showToast('Kopiëren mislukt'));
 }
 
 function makeCopyOfSet(){
@@ -821,14 +824,6 @@ function printSetPDF(){
     doc.save(`${SET.title}_begrippen.pdf`);
     showToast('✓ PDF gedownload!');
   }catch(e){showToast('Fout bij PDF genereren');}
-}
-
-function toSlug(str){
-  return str.toLowerCase().replace(/[àáâäãåā]/g,'a').replace(/[èéêëē]/g,'e').replace(/[ìíîïī]/g,'i').replace(/[òóôöõøō]/g,'o').replace(/[ùúûüū]/g,'u').replace(/[ñ]/g,'n').replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'').replace(/-+/g,'-').slice(0,60)||'set';
-}
-
-function escA(s){
-  return esc(s).replace(/'/g,'&#39;').replace(/"/g,'&quot;');
 }
 
 boot();

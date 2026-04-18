@@ -556,13 +556,15 @@ function updateAccentColorUI(hex){
 function applyThemeSettings(darkMode,accentColor){
   const root=document.documentElement.style;
   if(darkMode){
-    root.setProperty('--bg-grad','linear-gradient(160deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%)');
-    root.setProperty('--glass','rgba(20,20,40,0.85)');
-    root.setProperty('--glass2','rgba(15,15,35,0.80)');
-    root.setProperty('--text','#f0f0f0');
-    root.setProperty('--text2','#b0b0c0');
-    root.setProperty('--text3','#888899');
-    root.setProperty('--glass-border','rgba(100,100,150,0.3)');
+    root.setProperty('--bg-grad','linear-gradient(180deg, rgb(10, 10, 10) 0%, rgb(10, 8, 18) 100%)');
+    root.setProperty('--glass','rgb(34, 33, 41)');
+    root.setProperty('--glass2','rgba(34,33,41,0.90)');
+    root.setProperty('--text','#ffffff');
+    root.setProperty('--text2','#e9e9e9');
+    root.setProperty('--text3','rgba(255,255,255,0.65)');
+    root.setProperty('--glass-border','rgba(64,73,112,0.557)');
+    root.setProperty('--glass-shadow','0 0px 10px rgba(0,5,48,0.8), inset 1px 1px 0 rgba(88,93,120,0.9)');
+    root.setProperty('--glass-shadow-lg','0 8px 32px rgba(0,5,48,0.8), inset 1px 1px 0 rgba(88,93,120,0.9)');
   }else{
     root.setProperty('--bg-grad','linear-gradient(160deg,#f0eef9 0%,#ddd8f0 50%,#cfc8e8 100%)');
     root.setProperty('--glass','rgba(255,255,255,0.90)');
@@ -571,14 +573,20 @@ function applyThemeSettings(darkMode,accentColor){
     root.setProperty('--text2','#3d3a55');
     root.setProperty('--text3','#7c7899');
     root.setProperty('--glass-border','rgba(200,195,230,0.6)');
+    root.setProperty('--glass-shadow','0 2px 8px rgba(0,98,255,0.1),inset 1px 1px 0 rgba(255,255,255,1),inset -1px -1px 2px rgba(255,255,255,0.5)');
+    root.setProperty('--glass-shadow-lg','0 8px 32px rgba(0,98,255,0.15),inset 1px 1px 0 rgba(255,255,255,1),inset -1px -1px 2px rgba(255,255,255,0.5)');
   }
   if(accentColor&&accentColor!=='#0062ff'){
     root.setProperty('--accent',accentColor);
-    const c=parseInt(accentColor.slice(1),16);
-    const hsl=(c>>16)&255;
-    root.setProperty('--accent-light',accentColor+'1f');
+    root.setProperty('--accent2',accentColor);
+    const hex=accentColor.replace('#','');
+    const r=parseInt(hex.substr(0,2),16);
+    const g=parseInt(hex.substr(2,2),16);
+    const b=parseInt(hex.substr(4,2),16);
+    root.setProperty('--accent-light',`rgba(${r},${g},${b},0.12)`);
   }else{
     root.setProperty('--accent','#0062ff');
+    root.setProperty('--accent2','#0075ff');
     root.setProperty('--accent-light','rgba(0,98,255,0.12)');
   }
 }
@@ -587,9 +595,17 @@ function saveThemeSettings(darkMode,accentColor){
   localStorage.setItem('sd_theme',JSON.stringify({darkMode,accentColor}));
 }
 
-function toggleDD(id){const el=document.getElementById(id);if(!el)return;if(el.style.display==='none'||!el.style.display){el.style.display='block';}else closeDD(id);}
-function closeDD(id){const el=document.getElementById(id);if(el)el.style.display='none';}
-document.addEventListener('click',(e)=>{if(!e.target.closest('.settings-dropdown-wrap')&&!e.target.closest('.btn-icon')){document.querySelectorAll('[id$="-dd"]').forEach(dd=>{if(dd.classList.contains('settings-dropdown'))closeDD(dd.id);});};});
+function toggleDD(id){
+  const el=document.getElementById(id);
+  if(!el)return;
+  const isOpen=el.style.display==='block';
+  document.querySelectorAll('[id$="-dd"]').forEach(d=>{d.style.display='none';});
+  if(!isOpen)el.style.display='block';
+}
+document.addEventListener('click',(e)=>{
+  if(e.target.closest('.settings-dropdown-wrap'))return;
+  document.querySelectorAll('[id$="-dd"]').forEach(dd=>{dd.style.display='none';});
+});
 
 /* ══════════════════════════════════════════════════════
    DB
