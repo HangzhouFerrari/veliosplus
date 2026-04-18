@@ -277,6 +277,8 @@ svg.flame-icon{width:22px;height:22px;display:none}
 .section-hdr h3{font-size:20px;font-weight:800;letter-spacing:-0.3px}
 .shake-anim{animation:shake .35s}
 @keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-7px)}40%,80%{transform:translateX(7px)}}
+/* Copy input highlight for "overnemen" mode */
+.copy-inp-correct{border-color:var(--green)!important;background:rgba(24,182,114,0.08)!important;box-shadow:0 0 0 3px rgba(24,182,114,0.18)!important;}
 @media(max-width:640px){nav{padding:0 16px}.screen{padding:16px}.mode-grid{grid-template-columns:1fr}.nav-set-title{display:none}}
 </style>
 </head>
@@ -605,22 +607,27 @@ function fcReviewMistakes(){const mistakes=FC.terms.filter(t=>!FC.known.has(t));
 function fcApplyShuffle(){FC.terms=FC.shuffleOn?shuffle([...SET.terms]):[...SET.terms];FC.idx=0;FC.known.clear();FC._finished=false;fcUpdate();}
 
 /* ══════════════════════════════════════════
-   STAMPEN — FIXED
-   Bug 1 (infinite loop): stRenderQ used done%7===0 to trigger checkpoint,
-     but after the checkpoint closes it calls stRenderQ again with the same
-     done value → infinite loop. Fix: track _cpDoneAt and only fire once per value.
-   Bug 2 (controleer doet niks): stCheckOpen had an early-return `if(ST.answered)
-     {stRenderQ();return;}` which re-rendered the current question instead of
-     doing nothing, making the button appear broken. Fix: just return early, the
-     "Volgende" button handles progression.
-   Bug 3 (sla over hangt): stSkip called stRenderQ() directly after incrementing
-     wrong, but the next call's checkpoint check might fire or the term just
-     re-appeared. Fix: show feedback + next button, exactly like a wrong open answer.
+   STAMPEN
+   
+   Retry logic:
+   - Wrong answers go into _pendingRetry (not _wrongRetry directly)
+   - After each checkpoint, _pendingRetry items are moved into _wrongRetry
+     so they appear AFTER the checkpoint panel
+   - If a retry is answered wrong again: it goes back into _pendingRetry
+     (scheduled for AFTER the next checkpoint), and does NOT increment wrong counter
+   - If the main queue is empty, remaining _pendingRetry items are flushed into
+     _wrongRetry so the session can end at 100%
+   
+   "Juiste antwoorden overnemen" (copyCorrect):
+   - When enabled and an open answer is wrong, user must type the exact correct
+     answer before the Next button appears
+   - Does NOT change stats (wrong count stays as-is)
+   - The term is still queued for retry as normal
 ══════════════════════════════════════════ */
 let ST={};
 function renderStampen(){
   if(!ST._active||ST._setId!==SET.id){
-    ST={terms:shuffle([...SET.terms]),correct:0,wrong:0,qmode:'term',itype:'open',shuffleOn:true,typoLevel:2,hints:true,streak:0,wrongItems:[],_active:true,_setId:SET.id,_finished:false,_queue:[],_wrongRetry:[],_retryCountdown:0,_cpDoneAt:-1};
+    ST={terms:shuffle([...SET.terms]),correct:0,wrong:0,qmode:'term',itype:'open',shuffleOn:true,typoLevel:2,hints:true,copyCorrect:false,streak:0,wrongItems:[],_active:true,_setId:SET.id,_finished:false,_queue:[],_wrongRetry:[],_pendingRetry:[],_retryCountdown:0,_cpDoneAt:-1};
     stBuildQueue();
   }
   const el=document.getElementById('main-screen');
@@ -638,6 +645,7 @@ function renderStampen(){
               <div class="settings-row"><span class="settings-row-label">Niveau</span><select class="settings-select" onchange="ST.typoLevel=+this.value"><option value="1" ${ST.typoLevel===1?'selected':''}>Soepel</option><option value="2" ${ST.typoLevel===2?'selected':''}>Gemiddeld</option><option value="3" ${ST.typoLevel===3?'selected':''}>Streng</option></select></div>
               <div class="settings-row"><span class="settings-row-label">Schudden</span><label class="toggle"><input type="checkbox" ${ST.shuffleOn?'checked':''} onchange="ST.shuffleOn=this.checked;stHardReset()"><span class="toggle-slider"></span></label></div>
               <div class="settings-row"><span class="settings-row-label">Hint tonen</span><label class="toggle"><input type="checkbox" ${ST.hints?'checked':''} onchange="ST.hints=this.checked"><span class="toggle-slider"></span></label></div>
+              <div class="settings-row"><span class="settings-row-label">Juiste antw. overnemen</span><label class="toggle"><input type="checkbox" ${ST.copyCorrect?'checked':''} onchange="ST.copyCorrect=this.checked"><span class="toggle-slider"></span></label></div>
             </div>
             <div style="margin-top:10px"><button class="btn btn-glass btn-sm" style="width:100%" onclick="stHardReset();closeDD('st-dd')">↺ Opnieuw</button></div>
           </div>
@@ -655,12 +663,27 @@ function renderStampen(){
   if(ST._finished)stShowResultsOverlay();else stRenderQ();
 }
 
-function stBuildQueue(){ST._queue=ST.shuffleOn?shuffle([...SET.terms]):[...SET.terms];ST._wrongRetry=[];ST._retryCountdown=0;}
+function stBuildQueue(){ST._queue=ST.shuffleOn?shuffle([...SET.terms]):[...SET.terms];ST._wrongRetry=[];ST._pendingRetry=[];ST._retryCountdown=0;}
 
 function stGetCurrent(){
-  if(ST._wrongRetry.length>0&&ST._retryCountdown<=0){const t=ST._wrongRetry.shift();ST._retryCountdown=3;return{t,isRetry:true};}
+  // Draw from _wrongRetry first (these were released at last checkpoint)
+  if(ST._wrongRetry.length>0&&ST._retryCountdown<=0){
+    const t=ST._wrongRetry.shift();
+    ST._retryCountdown=3;
+    return{t,isRetry:true};
+  }
   if(ST._retryCountdown>0)ST._retryCountdown--;
-  if(!ST._queue.length)return null;
+  if(!ST._queue.length){
+    // Main queue empty: flush pending retries so session can finish
+    if(ST._pendingRetry.length>0){
+      ST._wrongRetry.push(...ST._pendingRetry);
+      ST._pendingRetry=[];
+      ST._retryCountdown=0;
+      const t=ST._wrongRetry.shift();
+      return{t,isRetry:true};
+    }
+    return null;
+  }
   return{t:ST._queue[0],isRetry:false};
 }
 
@@ -670,18 +693,21 @@ function stGetPair(t){
   return{q:d==='term'?t.term:t.def,a:d==='term'?t.def:t.term};
 }
 
-/* FIX 1: checkpoint uses _cpDoneAt to fire exactly once per multiple-of-7 */
 function stRenderQ(){
   const el=document.getElementById('st-main');if(!el)return;
   const done=ST.correct+ST.wrong;
+  // Fire checkpoint once per multiple-of-7, only for non-retry questions
   if(done>0&&done%7===0&&done!==(ST._cpDoneAt||0)){
-    ST._cpDoneAt=done;showCheckpoint();return;
+    ST._cpDoneAt=done;
+    // Release pending retries into _wrongRetry AFTER checkpoint
+    showCheckpoint();
+    return;
   }
   const cur=stGetCurrent();
   if(!cur){ST._finished=true;stShowResultsOverlay();return;}
   const{t,isRetry}=cur;
   const{q,a}=stGetPair(t);
-  ST._currentQ=q;ST._currentA=a;ST._currentT=t;ST._isRetry=isRetry;ST.answered=false;
+  ST._currentQ=q;ST._currentA=a;ST._currentT=t;ST._isRetry=isRetry;ST.answered=false;ST._copyDone=false;
   const useType=ST.itype==='mix'?(Math.random()>.5?'open':'mc'):ST.itype;
   ST._useType=useType;
   const hintLen=Math.ceil(a.length/3);
@@ -701,6 +727,7 @@ function stRenderQ(){
       <button class="btn btn-glass" onclick="stSkip()">Sla over</button>
     </div>
     <div id="st-fb" style="display:none;margin-top:12px"></div>
+    <div id="st-copy-area" style="display:none;margin-top:12px"></div>
     <div id="st-next-area" style="display:none;text-align:center;margin-top:10px"><button class="btn btn-glass btn-sm" onclick="stNext()">Volgende →</button></div>`;
   }
   el.innerHTML=`
@@ -718,64 +745,163 @@ function stPickMC(idx,chosen,answer){
   document.querySelectorAll('#st-mc-opts .mc-option').forEach(b=>{b.classList.remove('sel-correct','sel-wrong');b.style.pointerEvents='none';});
   document.getElementById('st-opt-'+idx).classList.add(ok?'sel-correct':'sel-wrong');
   if(ok){
-    ST.correct++;ST.streak++;if(!ST._isRetry)ST._queue.shift();else{ST.wrong=Math.max(0,ST.wrong-1);ST.wrongItems=ST.wrongItems.filter(w=>w.t!==ST._currentT);}checkStreak(ST.streak);stUpdateStats();
+    ST.correct++;ST.streak++;
+    if(!ST._isRetry){ST._queue.shift();}
+    else{
+      // Retry answered correctly: remove from wrongItems
+      ST.wrongItems=ST.wrongItems.filter(w=>w.t!==ST._currentT);
+    }
+    checkStreak(ST.streak);stUpdateStats();
     const fb=document.getElementById('st-fb');if(fb){fb.style.display='block';fb.className='st-feedback fb-correct';fb.innerHTML='✓ Correct! 🎉';}
     const na=document.getElementById('st-next-area');if(na)na.style.display='block';
     setTimeout(()=>stRenderQ(),1000);
   } else {
-    ST.wrong++;ST._streakBeforeWrong=ST.streak;ST.streak=0;ST.wrongItems.push({q:ST._currentQ,a:ST._currentA,given:chosen,t:ST._currentT});ST._wrongRetry.push(ST._currentT);if(!ST._isRetry)ST._queue.shift();stUpdateStats();
+    ST.streak=0;
+    if(!ST._isRetry){
+      // First-time wrong: increment counter, add to pending retry
+      ST.wrong++;ST._streakBeforeWrong=ST.streak;
+      ST.wrongItems.push({q:ST._currentQ,a:ST._currentA,given:chosen,t:ST._currentT});
+      ST._pendingRetry.push(ST._currentT);
+      ST._queue.shift();
+    } else {
+      // Retry wrong: do NOT increment counter, re-schedule for after next checkpoint
+      ST._pendingRetry.push(ST._currentT);
+    }
+    stUpdateStats();
     const fb=document.getElementById('st-fb');if(fb){fb.style.display='block';fb.className='st-feedback fb-wrong';fb.innerHTML=`✗ Fout. Juist: <strong>${esc(answer)}</strong>`;}
     const na=document.getElementById('st-next-area');if(na)na.style.display='block';
   }
 }
 
-/* FIX 2: stCheckOpen — removed the bad early-return that re-rendered on second Enter */
 function stCheckOpen(){
   const inp=document.getElementById('st-inp');if(!inp)return;
-  if(ST.answered)return; // already answered — Next button handles progression
+  if(ST.answered)return;
   const val=inp.value.trim();
   if(!val){inp.classList.add('shake-anim');setTimeout(()=>inp.classList.remove('shake-anim'),400);return;}
   ST.answered=true;inp.disabled=true;
   const ok=checkAns(val,ST._currentA,ST.typoLevel);
   if(ok){
-    ST.correct++;ST.streak++;if(!ST._isRetry)ST._queue.shift();else{ST.wrong=Math.max(0,ST.wrong-1);ST.wrongItems=ST.wrongItems.filter(w=>w.t!==ST._currentT);}checkStreak(ST.streak);stUpdateStats();
+    ST.correct++;ST.streak++;
+    if(!ST._isRetry){ST._queue.shift();}
+    else{ST.wrongItems=ST.wrongItems.filter(w=>w.t!==ST._currentT);}
+    checkStreak(ST.streak);stUpdateStats();
     const fb=document.getElementById('st-fb');if(fb){fb.style.display='block';fb.className='st-feedback fb-correct';fb.innerHTML='✓ Correct! 🎉';}
     const na=document.getElementById('st-next-area');if(na)na.style.display='block';
     setTimeout(()=>stRenderQ(),1200);
   } else {
-    ST.wrong++;ST._streakBeforeWrong=ST.streak;ST.streak=0;ST.wrongItems.push({q:ST._currentQ,a:ST._currentA,given:val,t:ST._currentT});ST._wrongRetry.push(ST._currentT);if(!ST._isRetry)ST._queue.shift();stUpdateStats();
-    const fb=document.getElementById('st-fb');if(fb){fb.style.display='block';fb.className='st-feedback fb-wrong';fb.innerHTML=`✗ Fout. Juist: <strong>${esc(ST._currentA)}</strong><br><button class="fb-override-btn" onclick="stOverride()">✓ Ik had het toch goed</button>`;}
+    ST.streak=0;
+    if(!ST._isRetry){
+      ST.wrong++;ST._streakBeforeWrong=ST.streak;
+      ST.wrongItems.push({q:ST._currentQ,a:ST._currentA,given:val,t:ST._currentT});
+      ST._pendingRetry.push(ST._currentT);
+      ST._queue.shift();
+    } else {
+      // Retry wrong again: re-schedule, no extra wrong count
+      ST._pendingRetry.push(ST._currentT);
+    }
+    stUpdateStats();
+    const fb=document.getElementById('st-fb');
+    if(fb){
+      fb.style.display='block';fb.className='st-feedback fb-wrong';
+      fb.innerHTML=`✗ Fout. Juist: <strong>${esc(ST._currentA)}</strong><br><button class="fb-override-btn" onclick="stOverride()">✓ Ik had het toch goed</button>`;
+    }
+    // "Juiste antwoorden overnemen" — show copy input if enabled and open type
+    if(ST.copyCorrect){
+      stShowCopyInput();
+    } else {
+      const na=document.getElementById('st-next-area');if(na)na.style.display='block';
+    }
+  }
+}
+
+/* Show the "copy the correct answer" input field */
+function stShowCopyInput(){
+  const ca=document.getElementById('st-copy-area');
+  if(!ca)return;
+  ca.style.display='block';
+  ca.innerHTML=`
+    <div style="font-size:13px;font-weight:700;color:var(--text2);margin-bottom:6px">
+      ✏️ Typ het juiste antwoord over om door te gaan:
+    </div>
+    <input type="text" id="st-copy-inp" placeholder="${escA(ST._currentA)}" autocomplete="off"
+      oninput="stCheckCopyInput(this)"
+      onkeydown="if(event.key==='Enter')stCheckCopyInput(document.getElementById('st-copy-inp'),true)">
+    <div id="st-copy-fb" style="font-size:12px;color:var(--text3);margin-top:4px">Typ exact: <em>${esc(ST._currentA)}</em></div>`;
+  setTimeout(()=>document.getElementById('st-copy-inp')?.focus(),60);
+}
+
+function stCheckCopyInput(inp,forceCheck){
+  if(!inp)return;
+  const val=inp.value;
+  const correct=ST._currentA;
+  if(val===correct){
+    inp.classList.add('copy-inp-correct');
+    inp.disabled=true;
+    const fb=document.getElementById('st-copy-fb');
+    if(fb){fb.style.color='var(--green)';fb.textContent='✓ Goed overgenomen!';}
     const na=document.getElementById('st-next-area');if(na)na.style.display='block';
+    ST._copyDone=true;
+  } else if(forceCheck){
+    inp.classList.add('shake-anim');
+    setTimeout(()=>inp.classList.remove('shake-anim'),400);
   }
 }
 
 function stOverride(){
-  ST.wrong=Math.max(0,ST.wrong-1);ST.correct++;ST.streak=(ST._streakBeforeWrong||0)+1;
-  ST._wrongRetry=ST._wrongRetry.filter(x=>x!==ST._currentT);ST.wrongItems=ST.wrongItems.filter(w=>w.t!==ST._currentT);
+  // Only works for first-time wrong (not retries counted separately)
+  if(!ST._isRetry){ST.wrong=Math.max(0,ST.wrong-1);ST.correct++;}
+  else{ST.correct++;}
+  ST.streak=(ST._streakBeforeWrong||0)+1;
+  ST._pendingRetry=ST._pendingRetry.filter(x=>x!==ST._currentT);
+  ST.wrongItems=ST.wrongItems.filter(w=>w.t!==ST._currentT);
   const fb=document.getElementById('st-fb');if(fb){fb.className='st-feedback fb-correct';fb.innerHTML='✓ Als goed gerekend!';}
-  checkStreak(ST.streak);stUpdateStats();setTimeout(()=>stRenderQ(),800);
+  // Hide copy area if shown
+  const ca=document.getElementById('st-copy-area');if(ca)ca.style.display='none';
+  checkStreak(ST.streak);stUpdateStats();
+  setTimeout(()=>stRenderQ(),800);
 }
 
-/* FIX 3: stSkip — shows feedback+next instead of calling stRenderQ directly */
 function stSkip(){
   if(ST.answered)return;
   ST.answered=true;
-  ST.wrong++;ST.streak=0;
-  ST.wrongItems.push({q:ST._currentQ,a:ST._currentA,given:'(overgeslagen)',t:ST._currentT});
-  ST._wrongRetry.push(ST._currentT);
-  if(!ST._isRetry)ST._queue.shift();
+  ST.streak=0;
+  if(!ST._isRetry){
+    ST.wrong++;
+    ST.wrongItems.push({q:ST._currentQ,a:ST._currentA,given:'(overgeslagen)',t:ST._currentT});
+    ST._pendingRetry.push(ST._currentT);
+    ST._queue.shift();
+  } else {
+    // Retry skipped: reschedule without incrementing wrong
+    ST._pendingRetry.push(ST._currentT);
+  }
   stUpdateStats();
   const fb=document.getElementById('st-fb');
   if(fb){fb.style.display='block';fb.className='st-feedback fb-wrong';fb.innerHTML=`Overgeslagen. Juist antwoord: <strong>${esc(ST._currentA)}</strong>`;}
-  const na=document.getElementById('st-next-area');if(na)na.style.display='block';
+  // copyCorrect on skip: show copy input too
+  if(ST.copyCorrect&&ST._useType==='open'){
+    stShowCopyInput();
+  } else {
+    const na=document.getElementById('st-next-area');if(na)na.style.display='block';
+  }
   const inp=document.getElementById('st-inp');if(inp)inp.disabled=true;
   document.querySelectorAll('.st-hint-btn').forEach(b=>b.disabled=true);
 }
 
-function stNext(){stRenderQ();}
+function stNext(){
+  // If copyCorrect is on and copy not done yet, don't proceed
+  if(ST.copyCorrect&&ST._useType==='open'&&ST.answered&&!ST._copyDone){
+    const ca=document.getElementById('st-copy-area');
+    if(ca&&ca.style.display!=='none'){
+      const inp=document.getElementById('st-copy-inp');
+      if(inp){inp.classList.add('shake-anim');setTimeout(()=>inp.classList.remove('shake-anim'),400);}
+      return;
+    }
+  }
+  stRenderQ();
+}
 
 function stUpdateStats(){
-  const remaining=ST._queue.length+ST._wrongRetry.length;
+  const remaining=ST._queue.length+ST._wrongRetry.length+ST._pendingRetry.length;
   document.getElementById('st-left').textContent=remaining;
   document.getElementById('st-cor').textContent=ST.correct;
   document.getElementById('st-wr').textContent=ST.wrong;
@@ -794,15 +920,23 @@ function stShowResultsOverlay(){
 
 function stHardReset(){
   if(confirm('Weet je zeker dat je opnieuw wilt beginnen?')){
-    const s={qmode:ST.qmode,itype:ST.itype,shuffleOn:ST.shuffleOn,typoLevel:ST.typoLevel,hints:ST.hints};
-    ST={...s,terms:s.shuffleOn?shuffle([...SET.terms]):[...SET.terms],correct:0,wrong:0,streak:0,wrongItems:[],_active:true,_setId:SET.id,_finished:false,_queue:[],_wrongRetry:[],_retryCountdown:0,_cpDoneAt:-1};
+    const s={qmode:ST.qmode,itype:ST.itype,shuffleOn:ST.shuffleOn,typoLevel:ST.typoLevel,hints:ST.hints,copyCorrect:ST.copyCorrect};
+    ST={...s,terms:s.shuffleOn?shuffle([...SET.terms]):[...SET.terms],correct:0,wrong:0,streak:0,wrongItems:[],_active:true,_setId:SET.id,_finished:false,_queue:[],_wrongRetry:[],_pendingRetry:[],_retryCountdown:0,_cpDoneAt:-1};
     stBuildQueue();renderStampen();
   }
 }
 
 function showCheckpoint(){
+  // Release pending retries into wrongRetry now (they appear after this checkpoint)
+  if(ST._pendingRetry.length>0){
+    ST._wrongRetry.push(...ST._pendingRetry);
+    ST._pendingRetry=[];
+    ST._retryCountdown=0;
+  }
   const done=ST.correct+ST.wrong;
-  const pct=Math.round((done/(done+ST._queue.length+0.001))*100);
+  const remaining=ST._queue.length+ST._wrongRetry.length;
+  const total=done+remaining;
+  const pct=Math.round((done/Math.max(total,1))*100);
   document.getElementById('checkpoint-layer').innerHTML=`
     <div class="checkpoint-overlay"><div class="checkpoint-panel">
       <div style="font-size:24px;font-weight:800;margin-bottom:4px">🔥 Voortgang: ${pct}%</div>
@@ -812,7 +946,7 @@ function showCheckpoint(){
         <div class="stat-box"><div class="stat-num stat-green">${ST.correct}</div><div class="stat-label">Goed</div></div>
         <div class="stat-box"><div class="stat-num stat-red">${ST.wrong}</div><div class="stat-label">Fout</div></div>
       </div>
-      ${ST.wrongItems.length?`<div style="margin:12px 0 8px;font-size:13px;font-weight:700;color:var(--red)">✗ Nog te leren (${ST.wrongItems.length})</div><div class="cp-mistake-list">${ST.wrongItems.map(w=>`<div class="cp-term unknown">✗ ${esc(w.t.term)}</div>`).join('')}</div>`:''}
+      ${ST._wrongRetry.length?`<div style="margin:12px 0 8px;font-size:13px;font-weight:700;color:var(--red)">🔁 Herhaling (${ST._wrongRetry.length} term${ST._wrongRetry.length===1?'':'en'})</div><div class="cp-mistake-list">${ST._wrongRetry.map(t=>`<div class="cp-term unknown">✗ ${esc(t.term)}</div>`).join('')}</div>`:''}
       <button class="btn btn-primary btn-lg" style="width:100%;margin-top:8px;position:relative;overflow:hidden" onclick="closeCheckpoint()">
         <div class="btn-timer-fill"></div><span style="position:relative;z-index:2">Doorgaan →</span>
       </button>
