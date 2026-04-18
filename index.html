@@ -2,7 +2,11 @@
 <html lang="nl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, minimum-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Velios+">
+<meta name="theme-color" content="#0062ff">
 <title>Velios+</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
 <style>
@@ -22,8 +26,8 @@
   --ease:cubic-bezier(0,0,.47,1.15);
   --ease2:cubic-bezier(0.34,1.56,0.64,1);
 }
-html{min-height:100vh;font-family:var(--font);color:var(--text);font-size:16px;overflow-x:hidden}
-body{min-height:100vh;background:var(--bg-grad);background-attachment:fixed;display:flex;flex-direction:column}
+html{min-height:100vh;font-family:var(--font);color:var(--text);font-size:16px;overflow-x:hidden;touch-action:manipulation;-webkit-user-select:none;user-select:none;}
+body{min-height:100vh;background:var(--bg-grad);background-attachment:fixed;display:flex;flex-direction:column;-webkit-touch-callout:none;-webkit-user-select:none;}
 
 /* Scrollbar styling */
 body.dark-mode::-webkit-scrollbar { width: 10px; }
@@ -287,6 +291,7 @@ input[type="text"],input[type="date"],textarea,select{
   background:rgba(255,255,255,0.85);border:1px solid rgba(200,195,230,0.6);
   border-radius:var(--r3);color:var(--text);font-family:var(--font);font-size:15px;
   padding:11px 16px;outline:none;transition:all .2s;width:100%;
+  -webkit-appearance:none;appearance:none;
 }
 input[type="text"]:focus,input[type="date"]:focus,textarea:focus,select:focus{
   border-color:var(--accent);background:rgba(255,255,255,0.98);
@@ -993,7 +998,9 @@ function renderHome(){
   const opts = {weekday:'long', year:'numeric', month:'long', day:'numeric'};
   document.getElementById('today-date').textContent = today.toLocaleDateString('nl-NL', opts).split(',')[0];
   document.getElementById('week-number').textContent = `Week ${getWeekNumber(today)}`;
-  
+
+  renderRecentSidebar();
+
   const recentKey = 'sd_recent_sets';
   let recent = [];
   try { recent = JSON.parse(localStorage.getItem(recentKey) || '[]'); } catch(e) {}
@@ -1090,6 +1097,34 @@ function goToVakLibrary(vak) {
   showPage('library');
   libraryFilter = vak;
   filterLibrary(vak);
+}
+
+function renderRecentSidebar(){
+  const recentKey='sd_recent_sets';
+  let recent=[];
+  try{recent=JSON.parse(localStorage.getItem(recentKey)||'[]');}catch(e){}
+  recent=recent.filter(id=>DB.sets.find(s=>s.id===id)).slice(0,3);
+  const recentSets=recent.map(id=>DB.sets.find(s=>s.id===id)).filter(Boolean);
+
+  const container=document.getElementById('recent-sidebar');
+  if(!container)return;
+
+  if(recentSets.length===0){
+    container.innerHTML='';
+    return;
+  }
+
+  container.innerHTML=recentSets.map(s=>`
+    <button class="recent-set-item" onclick="openSet('${s.id}')" title="${esc(s.title)}">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="3" width="7" height="7"/>
+        <rect x="14" y="3" width="7" height="7"/>
+        <rect x="14" y="14" width="7" height="7"/>
+        <rect x="3" y="14" width="7" height="7"/>
+      </svg>
+      <div class="recent-set-label">${esc(s.title)}</div>
+    </button>
+  `).join('');
 }
 
 function filterLibrary(filter) {
