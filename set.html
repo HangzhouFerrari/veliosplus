@@ -1085,7 +1085,7 @@ function showShareModal(){
     <h3 style="margin-bottom:16px">Delen</h3>
     <div style="display:flex;gap:8px;margin-bottom:12px">
       <input type="text" id="share-url" value="${esc(url)}" readonly style="flex:1;padding:10px;border:1px solid rgba(200,195,230,0.6);border-radius:8px;font-size:13px;background:rgba(255,255,255,0.7)">
-      <button class="btn btn-primary btn-sm" onclick="navigator.clipboard.writeText(document.getElementById('share-url').value).then(()=>showToast('✓ Gekopieerd!')).catch(()=>showToast('Kopiëren mislukt'))">📋 Kopie</button>
+      <button class="btn btn-primary btn-sm" onclick="navigator.clipboard.writeText(document.getElementById('share-url').value).then(()=>showToast('✓ Gekopieerd!')).catch(()=>showToast('Kopiëren mislukt'))"><svg width="13px" height="13px" xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256"><path data-name="Rectangle 30" fill="rgba(149,0,0,0)" d="M0 0h256v256H0z"/><g data-name="Group 20" transform="translate(-3611 1401)"><rect data-name="Rectangle 34" width="193" height="193" rx="33" transform="translate(3660 -1357)" fill="rgba(255,255,255,0.4)"/><rect data-name="Rectangle 33" width="193" height="193" rx="33" transform="translate(3626 -1382)" fill="#fff"/></g></svg> Kopieer</button>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
       <button class="btn btn-glass btn-sm" onclick="window.open('https://wa.me/?text=${encodeURIComponent(shareText+' '+url)}','_blank')">WhatsApp</button>
