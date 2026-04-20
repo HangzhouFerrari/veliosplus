@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>StudyDeck — Developer Console</title>
+<title>Velios Plus — Developer Console</title>
+<link rel="icon" href="favicon.png">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -216,6 +217,24 @@ textarea#vset-content{min-height:200px;font-family:monospace;font-size:12px}
           <button class="btn btn-glass btn-sm" onclick="copyJsonResult()">📋 Kopieren</button>
         </div>
         <textarea id="json-output" readonly style="min-height:180px;background:rgba(255,255,255,0.7);font-family:monospace;font-size:11px;resize:vertical"></textarea>
+      </div>
+    </div>
+
+    <!-- JSON/Base64 to Import Format -->
+    <div class="section">
+      <h2>🔄 JSON/Base64 → Import Format</h2>
+      <div class="input-group">
+        <label>Plak JSON of .vset Base64 om om te zetten naar term//def^ format</label>
+        <textarea id="conv-input" placeholder='{"title":...} of .vset code' style="min-height:100px;font-family:monospace;font-size:12px"></textarea>
+      </div>
+      <div class="actions">
+        <button class="btn btn-primary" onclick="convertToImportFormat()">Converteer</button>
+        <button class="btn btn-glass" onclick="document.getElementById('conv-input').value=''; document.getElementById('conv-output-area').style.display='none';">Wissen</button>
+      </div>
+      <div id="conv-output-area" style="display:none;margin-top:16px;background:rgba(24,182,114,0.06);border:1px solid rgba(24,182,114,0.2);border-radius:var(--r);padding:16px">
+        <label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px">Resultaat (kopieer naar Geavanceerd Import)</label>
+        <textarea id="conv-output" readonly style="min-height:100px;font-family:monospace;font-size:12px;background:rgba(255,255,255,0.7)"></textarea>
+        <button class="btn btn-glass btn-sm" style="margin-top:8px" onclick="copyToClipboardText(document.getElementById('conv-output').value)">📋 Kopieren</button>
       </div>
     </div>
 
@@ -678,6 +697,31 @@ function createSetFromAdvanced(){
 }
 
 /* ══════════════════════════════════════════
+   CONVERSION UTILS
+══════════════════════════════════════════ */
+function convertToImportFormat() {
+  const input = document.getElementById('conv-input').value.trim();
+  if(!input) { showToast('Plak eerst data'); return; }
+
+  let data = null;
+  try { data = decodeVset(input); } catch(e) {}
+  if(!data) { try { data = JSON.parse(input); } catch(e) {} }
+
+  if(!data || !data.terms) {
+    showToast('Ongeldige data of geen begrippen gevonden');
+    return;
+  }
+
+  const formatted = data.terms
+    .map(t => `${t.term.replace(/\/\//g, '/').replace(/\^/g, '')}//${t.def.replace(/\/\//g, '/').replace(/\^/g, '')}`)
+    .join('^');
+
+  document.getElementById('conv-output').value = formatted;
+  document.getElementById('conv-output-area').style.display = 'block';
+  showToast('Geconverteerd!');
+}
+
+/* ══════════════════════════════════════════
    HELPERS
 ══════════════════════════════════════════ */
 function toSlug(str){
@@ -699,6 +743,11 @@ function showToast(msg){
   t.classList.add('show');
   clearTimeout(window._tt);
   window._tt=setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+function copyToClipboardText(text) {
+  if(!text) return;
+  navigator.clipboard.writeText(text).then(() => showToast('Gekopieerd!'));
 }
 
 /* ══════════════════════════════════════════

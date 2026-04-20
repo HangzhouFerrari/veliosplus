@@ -1,33 +1,28 @@
-# StudyDeck — Bestandsstructuur
+# Velios+ - dé open-source website voor het leren van begrippen
 
 ```
-/
-├── index.html                        ← Startpagina (setbeheer)
-├── set.html                          ← Universele leerpagina
-└── sets/
-    ├── biologie-celbiologie.vset
-    └── ...
+Maak je eigen begrippensets, deel ze met anderen, leer bestaande sets en combineer meerdere sets tot één - kortom alles is mogelijk. Je hebt zelfs de optie om het uiterlijk aan te passen. Dit klink allemaal heel ingewikkeld om te realiseren tot een website, maar dat valt wel mee. De JavaScript zet .vset (JSON) bestanden om in digitale flitskaarten. Deze kan je in verschillende modi leren, wat het leren gepersonaliseerd maakt.
 ```
 
 ## URL-structuur
 
 ```
-https://jouwsite.com/set.html?set=biologie-celbiologie
+https://plus.velios.com/set?set=naam-set
 ```
 
-StudyDeck laadt dan `sets/biologie-celbiologie.vset`.
+Velios+ laadt dan `sets/naam-set.vset`.
 
 ## .vset bestanden
 
 `.vset` bestanden zijn versleuteld — niet leesbaar als plain JSON.
-Aanmaken via de **⬇ .vset** knop op de startpagina, dan in de `sets/` map zetten.
+Aanmaken via de nieuwe set knop op de startpagina, dan set downloaden vanuit de ontwikkelaars-console en tot slot in de `sets/` map zetten.
 
-## Workflow
+## Maak sets op jouw manier
 
-1. Open `index.html` → **Nieuwe set** → vul in → **Aanmaken**
-2. Klik **⬇ .vset** op de setkaart
-3. Zet het bestand in de `sets/` map op je server
-4. Deel de link: `set.html?set=jouw-set-naam`
+1. Open `index.html` → **Nieuwe set**
+2. Vul de begrippen en definities in.
+3. Formateer de begrippen en definities tot wens en voeg evt. een afbeelding toe.
+4. Klik op aanmaken.
 
 ## Fallback
 
