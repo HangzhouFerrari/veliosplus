@@ -97,7 +97,6 @@ nav{
   padding: env(safe-area-inset-top, 0px) 28px 0;
   height: calc(72px + env(safe-area-inset-top, 0px));
   display:flex;align-items:center;justify-content:space-between;
-  box-shadow:var(--glass-shadow);
 }
 .nav-logo{max-height: 50px; height: 100%;width:auto;display:flex;align-items:center;gap:8px;}
 .nav-logo-svg {height:80%;width:auto;display:block;}
@@ -277,12 +276,8 @@ if ('serviceWorker' in navigator) {
         <div class="settings-section">
           <div id="offline-actions">
             <button class="btn btn-glass" id="btn-offline-toggle" style="width:100%;padding:8px 12px;font-size:13px;margin-bottom:6px;text-align:left;justify-content:flex-start;gap:8px" onclick="toggleOfflineSet()">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2a10 10 0 0 1 10 10"/><path d="M12 6v6l4 2"/><circle cx="12" cy="12" r="10" opacity=".3"/><path d="M8 17l4 4 4-4M12 21v-8"/></svg>
-              <span id="offline-btn-label">Offline beschikbaar maken</span>
-            </button>
-            <button class="btn btn-glass" style="width:100%;padding:8px 12px;font-size:13px;margin-bottom:6px;text-align:left;justify-content:flex-start;gap:8px" onclick="downloadVset()">
-              <svg width="13" height="13" xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256"><g transform="translate(-2433 -926)"><path data-name="Rectangle 20" fill="rgba(0,0,0,0)" d="M2433 926h256v256h-256z"/><path data-name="Path 186" d="m2433 1108 5.667-3.964h240.488L2689 1108v45a29 29 0 0 1-29 29h-198a29 29 0 0 1-29-29Z" fill="var(--text)" opacity=".4"/><path data-name="Path 185" d="M2462 1182a28.8 28.8 0 0 1-11.288-2.279 28.9 28.9 0 0 1-9.219-6.214 28.9 28.9 0 0 1-6.215-9.218A28.8 28.8 0 0 1 2433 1153v-43.5h.021a6 6 0 0 1 5.979-5.5h8a6 6 0 0 1 5.98 5.5h.021v43.5a9.01 9.01 0 0 0 9 9h198a9.01 9.01 0 0 0 9-9v-43.5h.021a6 6 0 0 1 5.978-5.5h8a6 6 0 0 1 5.98 5.5h.021v43.5a28.8 28.8 0 0 1-2.279 11.289 28.9 28.9 0 0 1-6.214 9.218 28.9 28.9 0 0 1-9.219 6.214A28.8 28.8 0 0 1 2660 1182Z" fill="var(--text)" opacity=".6"/><rect data-name="Rectangle 38" width="30" height="170" rx="15" transform="translate(2546 940)" fill="var(--text)"/><path data-name="Polygon 1" d="M2567.1 1134.365a9 9 0 0 1-12.209 0l-41.981-38.752a9 9 0 0 1 6.109-15.613h83.962a9 9 0 0 1 6.1 15.613Z" fill="var(--text)"/></g></svg>
-              Set downloaden (.vset)
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2a10 10 0 0 1 10 10"/><path d="M12 6v6l4 2"/><circle cx="12" cy="12" r="10" opacity=".3"/><path d="M8 17l4 4 4-4M12 21v-8"/></svg>
+              <span id="offline-btn-label">Offline gebruiken</span>
             </button>
           </div>
           <div style="height:1px;background:rgba(180,170,210,0.3);margin:8px 0"></div>
@@ -305,6 +300,10 @@ if ('serviceWorker' in navigator) {
           <!-- Edit & Delete: only shown for local sets, toggled in JS -->
           <div id="local-set-actions" style="display:none">
             <div style="height:1px;background:rgba(180,170,210,0.3);margin:8px 0"></div>
+            <button class="btn btn-glass" style="width:100%;padding:8px 12px;font-size:13px;margin-bottom:6px;text-align:left;justify-content:flex-start;gap:8px" onclick="downloadVset()">
+              <svg width="13" height="13" xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256"><g transform="translate(-2433 -926)"><path data-name="Rectangle 20" fill="rgba(0,0,0,0)" d="M2433 926h256v256h-256z"/><path data-name="Path 186" d="m2433 1108 5.667-3.964h240.488L2689 1108v45a29 29 0 0 1-29 29h-198a29 29 0 0 1-29-29Z" fill="var(--text)" opacity=".4"/><path data-name="Path 185" d="M2462 1182a28.8 28.8 0 0 1-11.288-2.279 28.9 28.9 0 0 1-9.219-6.214 28.9 28.9 0 0 1-6.215-9.218A28.8 28.8 0 0 1 2433 1153v-43.5h.021a6 6 0 0 1 5.979-5.5h8a6 6 0 0 1 5.98 5.5h.021v43.5a9.01 9.01 0 0 0 9 9h198a9.01 9.01 0 0 0 9-9v-43.5h.021a6 6 0 0 1 5.978-5.5h8a6 6 0 0 1 5.98 5.5h.021v43.5a28.8 28.8 0 0 1-2.279 11.289 28.9 28.9 0 0 1-6.214 9.218 28.9 28.9 0 0 1-9.219 6.214A28.8 28.8 0 0 1 2660 1182Z" fill="var(--text)" opacity=".6"/><rect data-name="Rectangle 38" width="30" height="170" rx="15" transform="translate(2546 940)" fill="var(--text)"/><path data-name="Polygon 1" d="M2567.1 1134.365a9 9 0 0 1-12.209 0l-41.981-38.752a9 9 0 0 1 6.109-15.613h83.962a9 9 0 0 1 6.1 15.613Z" fill="var(--text)"/></g></svg>
+              Set downloaden (.vset)
+            </button>
             <button class="btn btn-glass" style="width:100%;padding:8px 12px;font-size:13px;margin-bottom:6px;text-align:left;justify-content:flex-start;gap:8px" onclick="editCurrentSet()">
               <svg width="13" height="13" xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256"><path data-name="Rectangle 17" fill="rgba(152,37,37,0)" d="M0 0h256v256H0z"/><g data-name="Group 13" transform="rotate(45 2187.158 -2777.125)" fill="var(--text)"><path data-name="Path 170" d="M2785 888.133a7.9 7.9 0 0 1-3.778-.941 7 7 0 0 1-2.831-2.824l-17.6-32.459a6.4 6.4 0 0 1-.779-2.688h49.978a6.4 6.4 0 0 1-.779 2.688l-17.6 32.459a7.03 7.03 0 0 1-2.831 2.824 7.9 7.9 0 0 1-3.78.941m25-54.655h-50V600.523a21.35 21.35 0 0 1 1.965-8.969 23 23 0 0 1 5.358-7.324 25.1 25.1 0 0 1 7.947-4.938 26.7 26.7 0 0 1 9.731-1.811 26.7 26.7 0 0 1 9.731 1.811 25.1 25.1 0 0 1 7.947 4.938 23 23 0 0 1 5.358 7.324 21.4 21.4 0 0 1 1.965 8.969v232.954Zm-24.5-237.083c-4.687 0-8.5 3.515-8.5 7.834v216.6c0 4.32 3.813 7.835 8.5 7.835s8.5-3.515 8.5-7.835v-216.6c0-4.32-3.81-7.835-8.499-7.835Z"/><rect data-name="Rectangle 19" width="17" height="232.271" rx="8.5" transform="translate(2777 596.393)" opacity=".6"/></g></svg>
               Set bewerken
@@ -1347,16 +1346,17 @@ function isSetOffline() {
 function updateOfflineBtn() {
   const btn = document.getElementById('btn-offline-toggle');
   const label = document.getElementById('offline-btn-label');
-  if (!btn || !label) return;
+  const svg = btn?.querySelector('svg');
+  if (!btn || !label || !svg) return;
+
   if (isSetOffline()) {
     btn.style.color = 'var(--red)';
-    btn.querySelector('svg').innerHTML = '<path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" opacity=".6"/>';
-    btn.querySelector('svg').setAttribute('stroke', 'var(--red)');
-    label.textContent = 'Niet meer offline bewaren';
+    label.textContent = 'Niet meer opslaan';
+    svg.outerHTML = `<svg width="13" height="13" xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256"><path data-name="Rectangle 20" fill="rgba(0,0,0,0)" d="M0 0h256v256H0z"/><g data-name="Group 15" fill="var(--red)"><path data-name="Path 181" d="M190.628 256H66.231a22.12 22.12 0 0 1-15.521-6.256 20.93 20.93 0 0 1-6.429-15.1L27.774 72.076a20.93 20.93 0 0 1 6.429-15.1 22.12 22.12 0 0 1 15.521-6.259h155.345a22.12 22.12 0 0 1 15.521 6.256 20.93 20.93 0 0 1 6.429 15.1l-14.445 162.568a20.93 20.93 0 0 1-6.429 15.1A22.12 22.12 0 0 1 190.628 256M162.914 74.908a12.03 12.03 0 0 0-12.061 11.654l-4.635 132.749a12.09 12.09 0 0 0 11.646 12.489q.201.008.429.008a12.025 12.025 0 0 0 12.06-11.654l4.636-132.749a12.075 12.075 0 0 0-11.646-12.488 10 10 0 0 0-.429-.009m-69.829 0q-.215-.002-.429.007a12.09 12.09 0 0 0-11.646 12.49l4.635 132.749a12.025 12.025 0 0 0 12.059 11.654q.23.002.43-.008a12.09 12.09 0 0 0 11.647-12.489l-4.635-132.749a12.026 12.026 0 0 0-12.061-11.654"/><path data-name="Path 179" d="M30.793 41.057A8.453 8.453 0 0 1 22.34 32.6a16.906 16.906 0 0 1 16.906-16.9h27.773A15.7 15.7 0 0 1 82.718 0h90.566a15.7 15.7 0 0 1 15.7 15.7h27.774a16.906 16.906 0 0 1 16.902 16.9 8.45 8.45 0 0 1-8.452 8.453Z"/><path data-name="Path 180" d="M157.86 231.8a12.075 12.075 0 0 1-11.646-12.489l4.639-132.746a12.076 12.076 0 0 1 24.137.843l-4.637 132.746a12.076 12.076 0 0 1-12.061 11.654q-.212 0-.432-.008m-72.214-11.646L81.01 87.405a12.075 12.075 0 0 1 24.136-.84l4.636 132.749a12.075 12.075 0 0 1-11.647 12.489c-.143 0-.287.007-.429.007a12.076 12.076 0 0 1-12.06-11.656" opacity=".4"/></g></svg>`;
   } else {
     btn.style.color = '';
-    btn.querySelector('svg').setAttribute('stroke', 'currentColor');
-    label.textContent = 'Offline beschikbaar maken';
+    label.textContent = 'Offline gebruiken';
+    svg.outerHTML = `<svg width="13" height="13" xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256"><path data-name="Rectangle 20" fill="rgba(0,0,0,0)" d="M0 0h256v256H0z"/><g data-name="Group 24" transform="translate(-2446 -936.951)" fill="var(--text)"><g data-name="Group 23"><path data-name="Path 189" d="M2642.946 1106.865a15.41 15.41 0 0 1-12.337-6.617 84 84 0 0 0-24.246-16.065 79 79 0 0 0-32.126-6.6 79 79 0 0 0-32.125 6.6 84 84 0 0 0-24.245 16.063 15.4 15.4 0 0 1-12.609 6.62 15.75 15.75 0 0 1-15.545-15.949 16.12 16.12 0 0 1 4.354-11.072l-.143-.149a114.7 114.7 0 0 1 35.882-24.673 108.65 108.65 0 0 1 44.431-9.1 107.3 107.3 0 0 1 44.432 9.236 114.6 114.6 0 0 1 33.691 22.86 16.07 16.07 0 0 1 6.4 13.18 15.744 15.744 0 0 1-15.537 15.672Zm43.485-45.364a15.17 15.17 0 0 1-12.12-6.479 146.1 146.1 0 0 0-43.724-29.29 139.3 139.3 0 0 0-56.349-11.479 139.3 139.3 0 0 0-56.349 11.479 146.1 146.1 0 0 0-46.245 31.8l-.08-.082a15.03 15.03 0 0 1-10.257 4.055h-.273a15.523 15.523 0 0 1-15.034-15.977 15.83 15.83 0 0 1 5.174-11.5 172.7 172.7 0 0 1 54.407-37.458 168.9 168.9 0 0 1 68.657-13.983 168.9 168.9 0 0 1 68.656 13.987 172.7 172.7 0 0 1 55.7 38.791l-.25.255a15.9 15.9 0 0 1 3.656 10.456 15.5 15.5 0 0 1-15.294 15.428Z" opacity=".4"/><path data-name="Path 190" d="M2555.828 1153.209a24.76 24.76 0 0 1-7.519-18.275 24.76 24.76 0 0 1 7.519-18.276 25.14 25.14 0 0 1 18.411-7.464 25.13 25.13 0 0 1 18.411 7.464 24.76 24.76 0 0 1 7.52 18.276 24.76 24.76 0 0 1-7.52 18.275 25.13 25.13 0 0 1-18.411 7.464 25.14 25.14 0 0 1-18.411-7.464" opacity=".6"/></g><rect data-name="Rectangle 47" width="22.261" height="282.713" rx="11.13" transform="rotate(45 177.689 3696.811)"/></g></svg>`;
   }
 }
 
