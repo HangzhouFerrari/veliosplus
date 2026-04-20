@@ -250,6 +250,13 @@ svg.flame-icon{width:22px;height:22px;display:none}
 
 @media(max-width:640px){nav{padding:0 16px}.screen{padding:16px}.mode-grid{grid-template-columns:1fr}.nav-set-title{display:none}}
 </style>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(err => console.warn('SW reg failed:', err));
+  });
+}
+</script>
 </head>
 <body>
 <div id="app">
@@ -268,6 +275,17 @@ svg.flame-icon{width:22px;height:22px;display:none}
       </button>
       <div id="set-menu" class="settings-dropdown" style="display:none;width:240px">
         <div class="settings-section">
+          <div id="offline-actions">
+            <button class="btn btn-glass" id="btn-offline-toggle" style="width:100%;padding:8px 12px;font-size:13px;margin-bottom:6px;text-align:left;justify-content:flex-start;gap:8px" onclick="toggleOfflineSet()">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2a10 10 0 0 1 10 10"/><path d="M12 6v6l4 2"/><circle cx="12" cy="12" r="10" opacity=".3"/><path d="M8 17l4 4 4-4M12 21v-8"/></svg>
+              <span id="offline-btn-label">Offline beschikbaar maken</span>
+            </button>
+            <button class="btn btn-glass" style="width:100%;padding:8px 12px;font-size:13px;margin-bottom:6px;text-align:left;justify-content:flex-start;gap:8px" onclick="downloadVset()">
+              <svg width="13" height="13" xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256"><g transform="translate(-2433 -926)"><path data-name="Rectangle 20" fill="rgba(0,0,0,0)" d="M2433 926h256v256h-256z"/><path data-name="Path 186" d="m2433 1108 5.667-3.964h240.488L2689 1108v45a29 29 0 0 1-29 29h-198a29 29 0 0 1-29-29Z" fill="var(--text)" opacity=".4"/><path data-name="Path 185" d="M2462 1182a28.8 28.8 0 0 1-11.288-2.279 28.9 28.9 0 0 1-9.219-6.214 28.9 28.9 0 0 1-6.215-9.218A28.8 28.8 0 0 1 2433 1153v-43.5h.021a6 6 0 0 1 5.979-5.5h8a6 6 0 0 1 5.98 5.5h.021v43.5a9.01 9.01 0 0 0 9 9h198a9.01 9.01 0 0 0 9-9v-43.5h.021a6 6 0 0 1 5.978-5.5h8a6 6 0 0 1 5.98 5.5h.021v43.5a28.8 28.8 0 0 1-2.279 11.289 28.9 28.9 0 0 1-6.214 9.218 28.9 28.9 0 0 1-9.219 6.214A28.8 28.8 0 0 1 2660 1182Z" fill="var(--text)" opacity=".6"/><rect data-name="Rectangle 38" width="30" height="170" rx="15" transform="translate(2546 940)" fill="var(--text)"/><path data-name="Polygon 1" d="M2567.1 1134.365a9 9 0 0 1-12.209 0l-41.981-38.752a9 9 0 0 1 6.109-15.613h83.962a9 9 0 0 1 6.1 15.613Z" fill="var(--text)"/></g></svg>
+              Set downloaden (.vset)
+            </button>
+          </div>
+          <div style="height:1px;background:rgba(180,170,210,0.3);margin:8px 0"></div>
           <button class="btn btn-glass" style="width:100%;padding:8px 12px;font-size:13px;margin-bottom:6px;text-align:left;justify-content:flex-start;gap:8px" onclick="showShareModal()">
             <svg width="13" height="13" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256"><g transform="translate(-3606.135 1413.942)" fill="var(--text)"><rect width="208" height="208" rx="41" transform="translate(3630 -1366)" opacity=".4"/><path d="M3797.051-1158H3671.22a41.186 41.186 0 0 1-41.22-41.22v-125.831a41.186 41.186 0 0 1 41.22-41.22h20.068v17.356h-20.068a23.89 23.89 0 0 0-23.864 23.864v125.831a23.89 23.89 0 0 0 23.864 23.865h125.831a23.89 23.89 0 0 0 23.865-23.865v-125.831a23.89 23.89 0 0 0-23.865-23.864h-20.068v-17.356h20.067a41.186 41.186 0 0 1 41.22 41.22v125.831a41.185 41.185 0 0 1-41.22 41.22Z" opacity=".6"/><rect width="18" height="132" rx="8" transform="translate(3725 -1363)" opacity=".6"/><path d="M3727.565-1408.569a7.5 7.5 0 0 1 2.879-3.645 7.17 7.17 0 0 1 4.055-1.158 7.34 7.34 0 0 1 4.042 1.3 7.83 7.83 0 0 1 2.855 3.73l23.565 62.058a8.15 8.15 0 0 1-.718 7.249 7.64 7.64 0 0 1-2.537 2.5 7 7 0 0 1-3.518.991l-47.813.565a7.25 7.25 0 0 1-3.659-.927 7.65 7.65 0 0 1-2.65-2.5 8.1 8.1 0 0 1-1.261-3.491 8.2 8.2 0 0 1 .508-3.912Z"/></g></svg>
             Delen
@@ -484,6 +502,8 @@ function renderSetView(){
       </div>`).join('')}
     </div>`;
   currentMode='home';
+  // Update offline knop status
+  setTimeout(() => updateOfflineBtn(), 100);
 }
 
 function startMode(mode){
@@ -637,7 +657,7 @@ function renderStampen(){
       <div class="stats-row" style="margin-top:12px">
         <div class="stat-box"><div class="stat-num stat-blue" id="st-left">${ST._queue.length}</div><div class="stat-label">Resterend</div></div>
         <div class="stat-box"><div class="stat-num stat-green" id="st-cor">${ST.correct}</div><div class="stat-label">Goed</div></div>
-        <div class="stat-box" title="Termen die herhaling nodig hebben"><div class="stat-num stat-red" id="st-wr">${ST._pendingRetry.length+ST._wrongRetry.length}</div><div class="stat-label">Herhalen</div></div>
+        <div class="stat-box" title="Termen die herhaling nodig hebben"><div class="stat-num stat-red" id="st-wr">${ST._pendingRetry.length+ST._wrongRetry.length}</div><div class="stat-label">Fout</div></div>
       </div>
       <div id="st-main"></div>
       <div class="results-overlay" id="st-results"></div>
@@ -726,7 +746,7 @@ function stRenderQ(){
   }
   el.innerHTML=`
     <div class="st-qbox" style="animation:cardLeft .3s var(--ease2)">
-      <div class="st-qlabel">${qlabel}${isRetry?' <span style="font-size:10px;background:rgba(232,58,74,0.15);color:var(--red);padding:2px 8px;border-radius:20px;margin-left:6px">🔁 Herhaling</span>':''}</div>
+      <div class="st-qlabel">${qlabel}${isRetry?' <span style="font-size:10px;background:rgba(232,58,74,0.15);color:var(--red);padding:2px 8px;border-radius:20px;margin-left:6px">Herhaling</span>':''}</div>
       <div class="st-qtext">${ST._dir==='term'?renderTerm(ST._currentT,'term')+renderImages(ST._currentT):renderTerm(ST._currentT,'def')}</div>
       <div id="st-hint-area" style="margin:8px 0;font-size:14px"></div>
     </div>${body}`;
@@ -947,7 +967,7 @@ function showCheckpoint(){
         <div class="stat-box"><div class="stat-num stat-green">${ST.correct}</div><div class="stat-label">Goed</div></div>
         <div class="stat-box"><div class="stat-num stat-red">${ST.wrong}</div><div class="stat-label">Fout</div></div>
       </div>
-      ${ST._wrongRetry.length?`<div style="margin:12px 0 8px;font-size:13px;font-weight:700;color:var(--red)">🔁 Nu herhalen (${ST._wrongRetry.length} term${ST._wrongRetry.length===1?'':'en'})</div><div class="cp-mistake-list">${ST._wrongRetry.map(t=>`<div class="cp-term unknown">✗ ${esc(t.term)}</div>`).join('')}</div>`:''}
+      ${ST._wrongRetry.length?`<div style="margin:12px 0 8px;font-size:13px;font-weight:700;color:var(--red)">Nu herhalen (${ST._wrongRetry.length} term${ST._wrongRetry.length===1?'':'en'})</div><div class="cp-mistake-list">${ST._wrongRetry.map(t=>`<div class="cp-term unknown">✗ ${esc(t.term)}</div>`).join('')}</div>`:''}
       <button class="btn btn-primary btn-lg" style="width:100%;margin-top:8px;position:relative;overflow:hidden" onclick="closeCheckpoint()">
         <div class="btn-timer-fill"></div><span style="position:relative;z-index:2">Doorgaan →</span>
       </button>
@@ -1305,6 +1325,88 @@ function generatePDF(jsPDFClass){
     const filename=(SET.title||'begrippen').replace(/[^a-zA-Z0-9_-]/g,'_')+'.pdf';
     doc.save(filename);showToast('✓ PDF gedownload!');
   }catch(e){console.error('PDF generation error:',e);showToast('Fout bij PDF genereren: '+e.message);}
+}
+
+/* ══════════════════════════════════════════
+   OFFLINE / DOWNLOAD FUNCTIES
+══════════════════════════════════════════ */
+
+function getOfflineSets() {
+  try { return JSON.parse(localStorage.getItem('sd_offline_sets') || '[]'); } catch(e) { return []; }
+}
+function saveOfflineSets(arr) {
+  try { localStorage.setItem('sd_offline_sets', JSON.stringify(arr)); } catch(e) {}
+}
+
+function isSetOffline() {
+  if (!SET) return false;
+  const offline = getOfflineSets();
+  return offline.some(s => s.id === SET.id || s.slug === SET.slug);
+}
+
+function updateOfflineBtn() {
+  const btn = document.getElementById('btn-offline-toggle');
+  const label = document.getElementById('offline-btn-label');
+  if (!btn || !label) return;
+  if (isSetOffline()) {
+    btn.style.color = 'var(--red)';
+    btn.querySelector('svg').innerHTML = '<path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" opacity=".6"/>';
+    btn.querySelector('svg').setAttribute('stroke', 'var(--red)');
+    label.textContent = 'Niet meer offline bewaren';
+  } else {
+    btn.style.color = '';
+    btn.querySelector('svg').setAttribute('stroke', 'currentColor');
+    label.textContent = 'Offline beschikbaar maken';
+  }
+}
+
+function toggleOfflineSet() {
+  if (!SET) return;
+  let offline = getOfflineSets();
+  if (isSetOffline()) {
+    offline = offline.filter(s => s.id !== SET.id && s.slug !== SET.slug);
+    saveOfflineSets(offline);
+    // Ook uit sd_sets verwijderen als het een gedownloade server-set is
+    let sets = JSON.parse(localStorage.getItem('sd_sets') || '[]');
+    // Alleen verwijderen als het NIET een lokale set is
+    if (SET.fromServer || SET._serverFile) {
+      sets = sets.filter(s => s.id !== SET.id && s.slug !== SET.slug);
+      localStorage.setItem('sd_sets', JSON.stringify(sets));
+    }
+    showToast('Set verwijderd uit offline opslag');
+  } else {
+    // Sla de volledige set op
+    const setToSave = { ...SET, _offlineSaved: true, _offlineSavedAt: Date.now() };
+    offline.push({ id: SET.id, slug: SET.slug, title: SET.title });
+    saveOfflineSets(offline);
+    // Zorg dat de set ook in sd_sets zit
+    let sets = JSON.parse(localStorage.getItem('sd_sets') || '[]');
+    const idx = sets.findIndex(s => s.id === SET.id || s.slug === SET.slug);
+    if (idx >= 0) { sets[idx] = setToSave; } else { sets.push(setToSave); }
+    localStorage.setItem('sd_sets', JSON.stringify(sets));
+    showToast('✓ Set beschikbaar gemaakt voor offline gebruik!');
+  }
+  updateOfflineBtn();
+  closeDD('set-menu');
+}
+
+function downloadVset() {
+  if (!SET) return;
+  const VSET_KEY = _k.join('');
+  function xorStr(str, key) {
+    return str.split('').map((c, i) => String.fromCharCode(c.charCodeAt(0) ^ key.charCodeAt(i % key.length))).join('');
+  }
+  const json = JSON.stringify(SET);
+  const encoded = btoa(unescape(encodeURIComponent(xorStr(json, VSET_KEY))));
+  const blob = new Blob([encoded], { type: 'application/octet-stream' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = (SET.slug || toSlug(SET.title)) + '.vset';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('✓ .vset bestand gedownload!');
+  closeDD('set-menu');
 }
 
 boot();
