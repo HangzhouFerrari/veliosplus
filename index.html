@@ -251,11 +251,14 @@ nav{
 .sidebar-btn:hover{
   color:var(--accent);
 }
+
+@media(min-width:750px){
 .sidebar-btn:not(.active):hover {
   transform: scale(1.1);
 }
 
 .sidebar-btn.active:hover {transform:scale(0.98);filter:brightness(0.5);}
+}
 
 .sidebar-btn.active{
   color:var(--accent);
