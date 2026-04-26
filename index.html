@@ -864,10 +864,10 @@ textarea{resize:vertical;min-height:72px;line-height:1.5}
     </div>
   </div>
 
-    <!-- ZOEKEN PAGE (alleen mobiel) -->
+<!-- ZOEKEN PAGE (alleen mobiel) -->
     <div id="zoeken" class="page">
       <div class="screen page-enter">
-        <div style="margin-bottom:16px">
+        <div style="margin-bottom:24px">
           <h1 style="font-size:32px;font-weight:800;margin-bottom:8px">Zoeken</h1>
         </div>
         <div class="search-wrapper" style="max-width:none;margin-bottom:24px;display:flex!important">
@@ -884,9 +884,6 @@ textarea{resize:vertical;min-height:72px;line-height:1.5}
         </div>
       </div>
     </div>
-
-  </div>
-</div>
 
 <div id="modal-bg" class="modal-bg hidden" onclick="if(event.target===this)closeModal()">
   <div class="modal-panel" id="modal-panel"></div>
@@ -1457,9 +1454,10 @@ function setupSearch(){
     }
     
     // --help toggle
-    if(query==='--help'){
-      searchBox.value='';
-      dropdown.style.display='none';
+    if(query==='help'){
+      dropdown.innerHTML='<div style="padding:16px;text-align:center;color:var(--text2);font-size:14px">Geen resultaten gevonden</div>';
+      updateDropdownPosition();
+      dropdown.style.display='block';
       showOnboarding('home',true);
       return;
     }
