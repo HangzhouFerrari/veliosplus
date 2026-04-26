@@ -1,4 +1,4 @@
-const CACHE = 'velios-v1';
+const CACHE = `velios-${new Date().toISOString().split('T')[0]}`;
 const ASSETS = [
   './',
   './index.html',
