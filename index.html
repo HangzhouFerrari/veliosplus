@@ -197,6 +197,7 @@ nav{
 
 .nav-actions{display:flex;gap:12px;align-items:center;flex:1;margin-left:20px}
 .search-wrapper{position:relative;flex:1;max-width:400px;display:flex;align-items:center}
+.mobile-search-wrapper{position:relative;width:100%;display:flex;align-items:center}
 .search-icon{position:absolute;left:12px;width:18px;height:18px;pointer-events:none}
 .search-wrapper .search-box{
   width:100%;height:36px;
@@ -524,9 +525,17 @@ textarea{resize:vertical;min-height:72px;line-height:1.5}
 .text-muted{color:var(--text2)}.text-sm{font-size:13px}
 
 @media(max-width:750px){
+  #zoeken .mobile-search-wrapper {
+    width: 100%;
+    box-sizing: border-box;
+  }
+  #zoeken .mobile-search-box-input {
+    width: 100% !important;
+    box-sizing: border-box;
+  }
   nav{padding: env(safe-area-inset-top, 0px) 16px 0;}
   nav .btn-primary, nav .nav-spacer { display: none !important; }
-  .screen{padding:16px;margin-left:0;margin-bottom:80px}
+  .screen{padding:16px;margin-left:0;margin-bottom:80px;overflow-x:hidden;max-width:100%;width:100%}
   .sidebar{
     left:0; right:0; bottom:0; top:auto;
     width:100%; height: calc(84px + env(safe-area-inset-bottom, 0px));
@@ -540,9 +549,12 @@ textarea{resize:vertical;min-height:72px;line-height:1.5}
   .sets-grid{grid-template-columns:1fr}
   .nav-actions { flex: 1; }
   .settings-dropdown-wrap { margin-left: auto !important; }
-  .search-wrapper { max-width: none; width: 100%; }
-  .search-box, .search-icon, .search-wrapper { display: none !important; }
+  .search-wrapper { max-width: none; width: 100%; flex: 1; }
+  nav .search-box, nav .search-icon, nav .search-wrapper { display: none !important; }
 }
+
+/* Forceer volledige breedte op de zoekpagina voor mobiel */
+#zoeken .screen { padding: 16px; width: 100%; }
 
 .page{display:none}
 .page.active{display:block}
@@ -862,17 +874,16 @@ textarea{resize:vertical;min-height:72px;line-height:1.5}
         <div class="vakken-grid" id="vakken-grid"></div>
       </div>
     </div>
-  </div>
-
+    
 <!-- ZOEKEN PAGE (alleen mobiel) -->
     <div id="zoeken" class="page">
       <div class="screen page-enter">
         <div style="margin-bottom:24px">
           <h1 style="font-size:32px;font-weight:800;margin-bottom:8px">Zoeken</h1>
         </div>
-        <div class="search-wrapper" style="max-width:none;margin-bottom:24px;display:flex!important">
-          <svg class="search-icon" style="display:block!important" xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256"><g transform="translate(-2433 -926)"><path data-name="Rectangle 20" fill="rgba(0,0,0,0)" d="M2433 926h256v256h-256z"/><rect data-name="Rectangle 28" width="170" height="170" rx="85" transform="translate(2460 953)" fill="var(--text)" opacity=".4"/><path data-name="Rectangle 26" d="M2545 978a60 60 0 1 0 60 60 60.07 60.07 0 0 0-60-60m0-25a85 85 0 1 1-85 85 85 85 0 0 1 85-85" fill="var(--text)"/><rect data-name="Rectangle 27" width="30" height="94" rx="15" transform="rotate(-45 2612.226 -2568.255)" fill="var(--text)" opacity=".6"/></g></svg>
-          <input type="text" class="search-box" id="mobile-search-box" placeholder="Zoek sets... (naam, vak, datum)" style="display:block!important;width:100%">
+        <div style="position:relative;width:100%;box-sizing:border-box;margin-bottom:24px;display:flex;align-items:center;flex-shrink:0">
+          <svg class="search-icon" style="display:block!important;z-index:1" xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256"><g transform="translate(-2433 -926)"><path data-name="Rectangle 20" fill="rgba(0,0,0,0)" d="M2433 926h256v256h-256z"/><rect data-name="Rectangle 28" width="170" height="170" rx="85" transform="translate(2460 953)" fill="var(--text)" opacity=".4"/><path data-name="Rectangle 26" d="M2545 978a60 60 0 1 0 60 60 60.07 60.07 0 0 0-60-60m0-25a85 85 0 1 1-85 85 85 85 0 0 1 85-85" fill="var(--text)"/><rect data-name="Rectangle 27" width="30" height="94" rx="15" transform="rotate(-45 2612.226 -2568.255)" fill="var(--text)" opacity=".6"/></g></svg>
+          <input type="text" class="mobile-search-box-input" id="mobile-search-box" placeholder="Zoek sets... (naam, vak, datum)" style="width:100%;flex:1;height:48px;background:rgba(255,255,255,0.85);border:1px solid var(--glass-border);border-radius:20px;padding:0 16px 0 42px;font-family:var(--font);font-size:15px;color:var(--text);outline:none;box-shadow:var(--glass-shadow);">
         </div>
         <div id="mobile-search-results"></div>
         <div id="mobile-recent-searches-section">
