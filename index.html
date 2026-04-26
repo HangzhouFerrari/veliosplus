@@ -6,7 +6,9 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Velios+">
-<meta name="theme-color" content="#0062ff">
+<meta name="theme-color" content="#f0eef9" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0a0812" media="(prefers-color-scheme: dark)">
+<meta id="theme-color-meta" name="theme-color" content="#f0eef9">
 <title>Velios+</title>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="appicon-png512x512.png">
@@ -957,6 +959,7 @@ function applyThemeSettings(darkMode,accentColor){
   
   if(darkMode){
     body.classList.add('dark-mode');
+    document.getElementById('theme-color-meta')?.setAttribute('content','#0a0812');
     root.setProperty('--bg-grad','linear-gradient(180deg, rgb(10, 10, 10) 0%, rgb(10, 8, 18) 100%)');
     root.setProperty('--glass','rgb(34, 33, 41)');
     root.setProperty('--glass2','rgba(34,33,41,0.90)');
@@ -968,6 +971,7 @@ function applyThemeSettings(darkMode,accentColor){
     root.setProperty('--glass-shadow-lg','0 8px 32px rgba(0,5,48,0.8), inset 1px 1px 0 rgba(88,93,120,0.9)');
   }else{
     body.classList.remove('dark-mode');
+    document.getElementById('theme-color-meta')?.setAttribute('content','#f0eef9');
     root.setProperty('--bg-grad','linear-gradient(160deg,#f0eef9 0%,#ddd8f0 50%,#cfc8e8 100%)');
     root.setProperty('--glass','rgba(255,255,255,0.90)');
     root.setProperty('--glass2','rgba(255,255,255,0.80)');
@@ -1406,7 +1410,6 @@ function setupMobileSearch() {
     }
     if (recentSection) recentSection.style.display = 'none';
     searchTimeout = setTimeout(() => {
-      saveRecentSearch(query);
       let results = DB.sets.filter(s =>
         s.title.toLowerCase().includes(query) ||
         (s.vak && s.vak.toLowerCase().includes(query)) ||
