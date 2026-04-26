@@ -656,10 +656,37 @@ textarea{resize:vertical;min-height:72px;line-height:1.5}
   background: var(--glass);
   border: 1.5px solid var(--glass-border);
   border-radius: 36px 36px 0 0;
-  padding: 12px 32px 48px;
   width: 100%; max-width: 540px;
+  height: auto;
+  max-height: 700px;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 32px 16px;
   animation: obSlideUp .45s cubic-bezier(0.34,1.2,0.64,1) both;
   text-align: center;
+}
+.onboard-body {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 4px;
+  overscroll-behavior: contain;
+}
+.onboard-body::-webkit-scrollbar {
+  width: 6px;
+}
+.onboard-body::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,.18);
+  border-radius: 999px;
+}
+.onboard-footer {
+  padding-top: 16px;
+}
+.onboard-btn:disabled {
+  background: rgba(120,120,120,0.9);
+  cursor: not-allowed;
+  opacity: 0.65;
+  box-shadow: none;
+  filter: none;
 }
 @keyframes obSlideUp {
   from { opacity: 0; transform: translateY(100px) }
@@ -695,7 +722,7 @@ textarea{resize:vertical;min-height:72px;line-height:1.5}
   font-size: 13px; color: var(--text2); line-height: 1.5;
 }
 .onboard-btn {
-  width: 100%; padding: 16px; border: none; border-radius: 18px;
+  width: 100%; padding: 16px; border: none; border-radius: var(--r3);
   background: linear-gradient(180deg, var(--accent) 0%, var(--accent2) 100%);
   color: #fff; font-family: var(--font); font-size: 17px; font-weight: 800;
   cursor: pointer; letter-spacing: -.2px;
@@ -2160,20 +2187,33 @@ function showOnboarding(key, force = false) {
   el.innerHTML = `
     <div class="onboard-panel">
       <div class="onboard-handle"></div>
-      <span class="onboard-icon">${d.icon}</span>
-      <div class="onboard-title">${d.title}</div>
-      <div class="onboard-desc">${d.desc}</div>
-      ${(d.features||[]).map(f=>`
-        <div class="onboard-feature">
-          <div class="onboard-feature-icon">${f.icon}</div>
-          <div class="onboard-feature-text">
-            <strong>${f.title}</strong>
-            <span>${f.desc}</span>
-          </div>
-        </div>`).join('')}
-      <button class="onboard-btn" onclick="closeOnboarding()">Verdergaan</button>
+      <div class="onboard-body">
+        <span class="onboard-icon">${d.icon}</span>
+        <div class="onboard-title">${d.title}</div>
+        <div class="onboard-desc">${d.desc}</div>
+        ${(d.features||[]).map(f=>`
+          <div class="onboard-feature">
+            <div class="onboard-feature-icon">${f.icon}</div>
+            <div class="onboard-feature-text">
+              <strong>${f.title}</strong>
+              <span>${f.desc}</span>
+            </div>
+          </div>`).join('')}
+      </div>
+      <div class="onboard-footer">
+        <button class="onboard-btn" onclick="closeOnboarding()">Verdergaan</button>
+      </div>
     </div>`;
   document.body.appendChild(el);
+  const body = el.querySelector('.onboard-body');
+  const btn = el.querySelector('.onboard-btn');
+  function updateOnboardButtonState() {
+    const canScroll = body.scrollHeight <= body.clientHeight + 2;
+    const isBottom = body.scrollTop + body.clientHeight >= body.scrollHeight - 2;
+    btn.disabled = !(canScroll || isBottom);
+  }
+  body.addEventListener('scroll', updateOnboardButtonState);
+  setTimeout(updateOnboardButtonState, 0);
 }
 
 function closeOnboarding() {
