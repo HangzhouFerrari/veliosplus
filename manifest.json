@@ -3,8 +3,8 @@
   "short_name": "Velios+",
   "start_url": "index.html",
   "display": "standalone",
-  "background_color": "#0062ff",
-  "theme_color": "#0062ff",
+  "background_color": "#fff",
+  "theme_color": "#BA0000",
   "icons": [
     {
       "src": "appicon-png512x512.png",
