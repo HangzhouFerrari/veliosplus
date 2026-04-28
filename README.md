@@ -28,3 +28,26 @@ Aanmaken via de nieuwe set knop op de startpagina, dan set downloaden vanuit de 
 
 Als het `.vset` bestand niet op de server staat, valt de app terug
 op lokaal opgeslagen sets (localStorage van `index.html`).
+
+## .vset naam structuur
+
+1. Vak:
+```
+La: 01	Du: 02	Gr: 03	Gs: 04	Na: 04	Sk: 05	Ak: 06	Ne: 07	Bi: 08
+```
+
+2. Hoofdstuk/paragraaf
+```
+H1: ..01..	H2: ..02..	etc
+```
+```
+§1: ..010..	P2: ..020..	P12: ..012..	P2 t/m P6: ..2t6..	etc
+```
+
+3. Periode en klas
+```
+Bijv. Periode 1 en klas 4: ..14		Periode 3 klas 5: ..35
+```
+
+Voorbeeld: 	Natuurkunde H5 §3 t/m 5 periode 3 klas 3: 04053t533.vset
+		Duits boek 3 schritt 17 periode 2 klas 2: 020301722.vset
