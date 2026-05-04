@@ -504,12 +504,12 @@ textarea{resize:vertical;min-height:72px;line-height:1.5}
 
 /* Modal */
 .modal-bg{position:fixed;inset:0;z-index:2000;background:rgba(160,150,200,0.4);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;}
-.modal-panel{background:var(--glass);color:var(--text);border:1.5px solid var(--glass-border);border-radius:var(--r2);padding:28px;width:90%;max-width:860px;max-height:92vh;overflow-y:auto;box-shadow:0 16px 64px rgba(80,60,160,0.2);animation:slideUp .35s var(--ease2);transition:all .4s var(--ease2);}
+.modal-panel{background:var(--glass);color:var(--text);border:1.5px solid var(--glass-border);border-radius:var(--r2);padding:28px;width:90%;max-width:860px;max-height:92vh;overflow-y:auto;box-shadow:0 16px 64px rgba(80,60,160,0.2);animation:slideUp .35s var(--ease2);transition:all .4s var(--ease2);display:flex;flex-direction:column;}
 .modal-panel h3{font-size:20px;font-weight:800;margin-bottom:16px;letter-spacing:-0.3px;display:flex;align-items:center;justify-content:space-between}
 .modal-header-actions{display:flex;gap:4px}
 .modal-header-btn{width:32px;height:32px;display:inline-flex;align-items:center;justify-content:center;background:rgba(0,98,255,0.08);border:none;cursor:pointer;border-radius:8px;color:var(--text2);transition:all .15s;font-size:16px}
 .modal-header-btn:hover{background:rgba(0,98,255,0.15);color:var(--accent)}
-.modal-footer{display:flex;gap:8px;justify-content:flex-end;margin-top:20px;padding-top:16px;border-top:1px solid rgba(180,170,210,0.2)}
+.modal-footer{display:flex;gap:8px;justify-content:flex-end;margin-top:auto;padding-top:16px;border-top:1px solid rgba(180,170,210,0.2);flex-shrink:0}
 .modal-bg.modal-maximized .modal-panel{width:98%;max-width:none;max-height:97vh;border-radius:var(--r)}
 .modal-bg.modal-fullscreen .modal-panel{width:100%;max-width:none;height:100vh;max-height:100vh;border-radius:0;border:none}
 
@@ -532,7 +532,10 @@ textarea{resize:vertical;min-height:72px;line-height:1.5}
     box-sizing: border-box;
   }
   nav{padding: env(safe-area-inset-top, 0px) 16px 0;}
-  nav .btn-primary, nav .nav-spacer { display: none !important; }
+  nav .btn-primary { width: 40px; height: 40px; padding: 0; border-radius: var(--r3); overflow: hidden; display: flex; align-items: center; justify-content: center; order: 99; }
+  nav .btn-primary svg { width: 20px !important; height: 20px !important; display: block; }
+  nav .btn-primary span { display: none; }
+  nav .nav-spacer { display: none !important; }
   .screen{padding:16px;margin-left:0;margin-bottom:80px;overflow-x:hidden;max-width:100%;width:100%}
   .sidebar{
     left:0; right:0; bottom:0; top:auto;
@@ -545,10 +548,33 @@ textarea{resize:vertical;min-height:72px;line-height:1.5}
   .sidebar div[style*="height:1px"], .sidebar div[style*="flex:1"], #recent-sidebar { display: none !important; }
   .home-hero h1{font-size:32px}.two-col{grid-template-columns:1fr}
   .sets-grid{grid-template-columns:1fr}
-  .nav-actions { flex: 1; }
+  .nav-actions { flex: 1; display: flex; gap: 8px; }
   .settings-dropdown-wrap { margin-left: auto !important; }
   .search-wrapper { max-width: none; width: 100%; flex: 1; }
   nav .search-box, nav .search-icon, nav .search-wrapper { display: none !important; }
+  .modal-panel { width: 100% !important; max-width: 100% !important; height: 100vh !important; max-height: 100vh !important; border-radius: 0 !important; border: none !important; padding: 16px !important; overflow-y: hidden !important; display: flex !important; flex-direction: column !important; }
+  .modal-content { flex: 1; overflow-y: auto; padding-right: 4px; }
+  .modal-bg { background: rgba(160,150,200,0.8) !important; }
+  .modal-header-btn { display: none !important; }
+  .two-col { grid-template-columns: 1fr !important; }
+  .modal-panel h3 { padding-bottom: 12px !important; border-bottom: 1px solid rgba(180,170,210,0.2) !important; margin-bottom: 16px !important; flex-shrink: 0; display: flex !important; align-items: center !important; justify-content: space-between !important; }
+  .modal-panel [style*="grid-template-columns:28px"] { grid-template-columns: 1fr !important; }
+  #ce-pairs { flex: 1; overflow-y: auto; max-height: none !important; overflow-y: auto !important; }
+  .pair-row { display: grid !important; grid-template-columns: auto 1fr auto !important; grid-template-rows: auto auto !important; gap: 6px !important; align-items: start !important; }
+  .pair-num { grid-row: 1 / 3 !important; grid-column: 1 !important; display: flex !important; align-items: center !important; }
+  .pair-col:first-of-type { grid-column: 2 !important; grid-row: 1 !important; gap: 6px !important; }
+  .pair-col:nth-of-type(2) { grid-column: 2 !important; grid-row: 2 !important; gap: 6px !important; }
+  .pair-del { grid-row: 1 / 3 !important; grid-column: 3 !important; display: flex !important; align-items: center !important; }
+  .rich-editor { min-height: 50px !important; padding: 6px !important; font-size: 13px !important; line-height: 1.4 !important; }
+  .fmt-bar { flex-wrap: wrap !important; padding: 3px !important; gap: 2px !important; }
+  .fmt-btn, .fmt-clear, .img-upload-btn { font-size: 11px !important; padding: 3px 6px !important; }
+  .color-swatch { width: 20px !important; height: 20px !important; }
+  .fmt-sep { min-width: 1px !important; }
+  .image-gallery { display: flex !important; flex-wrap: wrap !important; gap: 6px !important; }
+  .image-thumb { max-width: 50px !important; max-height: 50px !important; }
+  .modal-footer { flex-shrink: 0; margin-top: 0 !important; padding-top: 16px !important; border-top: 1px solid rgba(180,170,210,0.2) !important; flex-wrap: wrap; gap: 6px !important; }
+  .modal-footer button { min-width: fit-content; font-size: 12px !important; padding: 6px 10px !important; }
+}
 }
 
 /* Forceer volledige breedte op de zoekpagina voor mobiel */
@@ -755,7 +781,7 @@ textarea{resize:vertical;min-height:72px;line-height:1.5}
     </div>
     <button class="btn btn-primary btn-sm" onclick="showCreateModal()">
       <svg width="14" height="14" xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256"><path data-name="Rectangle 20" fill="rgba(255,255,255,0)" d="M0 0h256v256H0z"/><g data-name="Group 28" fill="#fff"><path data-name="Rectangle 20" d="M71.766 10h112.468A61.766 61.766 0 0 1 246 71.766v112.468A61.766 61.766 0 0 1 184.234 246H71.766A61.766 61.766 0 0 1 10 184.234V71.766A61.766 61.766 0 0 1 71.766 10" opacity=".4"/><path data-name="Path 207" d="M124.5 198a9.626 9.626 0 0 1-9.626-9.626v-47.25h-47.25A9.625 9.625 0 0 1 58 131.5v-7a9.625 9.625 0 0 1 9.625-9.625h47.25v-47.25A9.626 9.626 0 0 1 124.5 58h7a9.625 9.625 0 0 1 9.626 9.625v47.25h47.25A9.625 9.625 0 0 1 198 124.5v7a9.625 9.625 0 0 1-9.625 9.625h-47.25v47.25A9.626 9.626 0 0 1 131.5 198Z"/></g></svg>
-      Nieuwe set
+      <span>Nieuwe set</span>
     </button>
     <div class="settings-dropdown-wrap" style="margin-left:8px">
       <button class="btn-icon" onclick="toggleDD('theme-dd')" title="Thema instellingen">
@@ -1847,7 +1873,7 @@ let CE = { id: null, pairs: [], viewMode: 0 }; // 0: klein, 1: breed, 2: volledi
 
 function showCreateModal(id) {
   CE.id = id || null;
-  CE.viewMode = 0;
+  CE.viewMode = window.innerWidth <= 750 ? 2 : 0;
   let s = id ? DB.sets.find(x => x.id === id) : null;
 
   if (!id) {
@@ -1875,6 +1901,7 @@ function showCreateModal(id) {
         <button class="modal-header-btn" onclick="toggleMaximize()" title="Maximaliseer"><svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" viewBox="0 0 256 256"><path data-name="Rectangle 20" fill="rgba(255,255,255,0)" d="M2433 926h256v256h-256z" transform="translate(-2433 -926)"/><path data-name="Rectangle 20" d="M2504.766 936h112.468A61.766 61.766 0 0 1 2679 997.766v112.468a61.766 61.766 0 0 1-61.766 61.766h-112.468a61.766 61.766 0 0 1-61.766-61.766V997.766A61.766 61.766 0 0 1 2504.766 936" fill="var(--accent)" opacity=".4" transform="translate(-2433 -926)"/><path data-name="Rectangle 59" fill="var(--accent)" opacity=".6" d="m2634.186 960.308 20.506 20.506-166.877 166.877-20.506-20.506z" transform="translate(-2433 -926)"/><path data-name="Path 235" d="M2602.5 936h14.734A61.766 61.766 0 0 1 2679 997.766v14.734a14.5 14.5 0 0 1-14.5 14.5 14.5 14.5 0 0 1-14.5-14.5v-14.734A32.8 32.8 0 0 0 2617.234 965H2602.5a14.5 14.5 0 0 1-14.5-14.5 14.5 14.5 0 0 1 14.5-14.5" fill="var(--accent)" transform="translate(-2433 -926)"/><path data-name="Path 236" d="M2519.5 1172h-14.734a61.766 61.766 0 0 1-61.766-61.766V1095.5a14.5 14.5 0 0 1 14.5-14.5 14.5 14.5 0 0 1 14.5 14.5v14.734a32.8 32.8 0 0 0 32.766 32.766h14.734a14.5 14.5 0 0 1 14.5 14.5 14.5 14.5 0 0 1-14.5 14.5" fill="var(--accent)" transform="translate(-2433 -926)"/></svg></button>
       </div>
     </h3>
+    <div class="modal-content">
     <div class="two-col" style="margin-bottom:12px">
       <div class="input-group"><label>Titel *</label><input id="c-title" type="text" placeholder="Bijv. Biologie H3" value="${esc(s?.title||'')}" oninput="ceSaveDraft()"></div>
       <div class="input-group"><label>Vak</label><input id="c-vak" type="text" placeholder="Bijv. Wiskunde" value="${esc(s?.vak||'')}" oninput="ceSaveDraft()"></div>
@@ -1902,6 +1929,7 @@ function showCreateModal(id) {
 
     <div id="ce-pairs" style="max-height:360px;overflow-y:auto;padding-right:2px"></div>
     <button class="btn btn-glass" style="width:100%;margin-top:8px" onclick="ceAdd()">+ Begrip toevoegen</button>
+    </div>
 
     <div class="modal-footer">
       <button class="btn btn-sm" style="background:rgba(232,58,74,0.1);color:var(--red);margin-right:auto" onclick="ceClearDraft()">Concept verwijderen</button>
@@ -1917,6 +1945,7 @@ function showCreateModal(id) {
 }
 
 function toggleMaximize() {
+  if (window.innerWidth <= 750) return;
   CE.viewMode = (CE.viewMode + 1) % 3;
   const bg = document.getElementById('modal-bg');
   const btn = document.querySelector('.modal-header-btn');
@@ -2089,7 +2118,14 @@ function doDelete(id) { DB.sets = DB.sets.filter(s => s.id !== id); saveDB(); cl
 ══════════════════════════════════════════════════════ */
 function showModal(html) {
   document.getElementById('modal-panel').innerHTML = html;
-  document.getElementById('modal-bg').classList.remove('hidden');
+  const bg = document.getElementById('modal-bg');
+  bg.classList.remove('hidden');
+  bg.classList.remove('modal-maximized', 'modal-fullscreen');
+  if (CE.viewMode === 1) {
+    bg.classList.add('modal-maximized');
+  } else if (CE.viewMode === 2) {
+    bg.classList.add('modal-fullscreen');
+  }
 }
 function closeModal() {
   CE.viewMode = 0;
