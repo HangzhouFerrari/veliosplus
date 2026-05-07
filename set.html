@@ -583,7 +583,8 @@ const _sfx = {
 function _loadSFX() {
   ['correct','incorrect','checkpoint','finish'].forEach(name => {
     const a = new Audio(`./SFX/${name}.wav`);
-    a.preload = 'auto';
+    a.preload = 'none';
+    a.crossOrigin = 'anonymous';
     _sfx[name] = a;
   });
 }
