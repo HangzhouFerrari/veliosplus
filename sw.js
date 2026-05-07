@@ -18,13 +18,27 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
-  // Netwerk-first voor .vset en index.json, cache-first voor de rest
+  // HTML network-first (altijd nieuwste versie ophalen)
+  if (e.request.url.endsWith('.html') || e.request.url.endsWith('/')) {
+    e.respondWith(
+      fetch(e.request).then(resp => {
+        if (resp && resp.status === 200) {
+          const clone = resp.clone();
+          caches.open(CACHE).then(c => c.put(e.request, clone));
+        }
+        return resp;
+      }).catch(() => caches.match(e.request) || caches.match('./index.html'))
+    );
+    return;
+  }
+  // .vset en index.json network-first
   if (e.request.url.includes('.vset') || e.request.url.includes('index.json')) {
     e.respondWith(
       fetch(e.request).catch(() => caches.match(e.request))
     );
     return;
   }
+  // Favicon en andere assets cache-first maar met fallback
   e.respondWith(
     caches.match(e.request).then(cached => {
       if (cached) return cached;
