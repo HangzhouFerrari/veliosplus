@@ -815,6 +815,16 @@ async function boot(){
 }
 function showError(msg){document.getElementById('loading').innerHTML=`<div style="font-size:48px;margin-bottom:16px">😕</div><div style="font-size:20px;font-weight:800;margin-bottom:12px">Set niet gevonden</div><p style="color:var(--text2);max-width:400px;line-height:1.6">${msg}</p><a href="index.html" class="btn btn-primary" style="margin-top:24px;text-decoration:none">← Terug naar home</a>`;}
 function toSlug(str){return str.toLowerCase().replace(/[àáâäãåā]/g,'a').replace(/[èéêëē]/g,'e').replace(/[ìíîïī]/g,'i').replace(/[òóôöõøō]/g,'o').replace(/[ùúûüū]/g,'u').replace(/[ñ]/g,'n').replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'').replace(/-+/g,'-').slice(0,60)||'set';}
+function generateUniqueSlug(){
+  let slug;
+  const sets = JSON.parse(localStorage.getItem('sd_sets')||'[]');
+  const existing = new Set(sets.map(s=>s.slug));
+  do {
+    const digits = Array.from({length:8},()=>Math.floor(Math.random()*10)).join('');
+    slug = 'my'+digits;
+  } while(existing.has(slug));
+  return slug;
+}
 
 function isLocalSet(s){
   return s && !s.fromServer && !s._serverFile;
@@ -1627,7 +1637,7 @@ function showShareModal(){
 function makeCopyOfSet(){
   if(!SET)return;
   const newTitle=`Copy of ${SET.title}`;
-  const newSlug=toSlug(newTitle);
+  const newSlug=generateUniqueSlug();
   const newSet={id:'set_copy_'+Date.now(),slug:newSlug,title:newTitle,description:SET.description||'',vak:SET.vak||'',datum:SET.datum||'',terms:SET.terms.map(t=>({...t}))};
   try{
     const sets=JSON.parse(localStorage.getItem('sd_sets')||'[]');
@@ -1732,7 +1742,7 @@ function doCombinateSets(){
   let num = 1;
   while(existingSets.includes(`Mijn combinatie (${num})`)) num++;
   const newTitle = `Mijn combinatie (${num})`;
-  const newSlug = toSlug(newTitle);
+  const newSlug = generateUniqueSlug();
   const newSet = {id:'set_combo_'+Date.now(),slug:newSlug,title:newTitle,description:'Combinatie van: '+selected.map(s=>s.title).join(', '),vak:'',datum:new Date().toISOString().split('T')[0],terms:combinedTerms};
   allSets.push(newSet);
   localStorage.setItem('sd_sets', JSON.stringify(allSets));
